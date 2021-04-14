@@ -1,14 +1,16 @@
 %% n-R PLANAR JOINT ROBOT MODEL under gravity
+clear all;
+close all;
+clc;
+
+addpath(genpath('./utils'));
+addpath(genpath('./modelFunctions'));
 
 %% Declaration of symbolic variables
 % The state q can be partioned in (q1, q2) where 
 % q1 are the positions of the two links
 % q2 are the positions of the two motors
-clear all
-close all
-clc
 
-addpath(genpath('./utils'));
 
 tic
 n = 2;
