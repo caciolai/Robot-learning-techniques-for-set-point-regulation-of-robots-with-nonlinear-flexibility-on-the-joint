@@ -10,6 +10,8 @@ function cineq = mpcInequalityConstraints(x, u, e, data, Ts, B, K1, K2, x_ref, p
     % imponiamo che le theta stiano in un quadrato di lato 0.2
     % centrato nella reference del motore
     
+    theta_ref = x_ref(3:4)';
+
     % abs(theta_1 - theta^d_1) < 0.2
     C1 =  abs(x(end,3) - theta_ref(1)) - 0.2;
     

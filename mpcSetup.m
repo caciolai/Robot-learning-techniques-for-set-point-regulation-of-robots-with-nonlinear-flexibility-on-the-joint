@@ -6,12 +6,15 @@ clc
 addpath(genpath('./modelFunctions'));
 addpath(genpath('./mpcFunctions'));
 
-%% Model parameters
-rg = 50; % Gear reduction ratio
-Im_zz = 0.015; % Motor inertia 
-B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
+%% Motor parameters 
+% rg = 50; % Gear reduction ratio
+% Im_zz = 0.015; % Motor inertia 
+% B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
 
-% Elasticity 
+% Motor inertia matrix
+B = eye(2);
+
+% Stiffness matrices (for elasticity)
 K1 = eye(2) * 1000;
 K2 = eye(2) * 10;
 
@@ -42,7 +45,7 @@ mpc.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
 %% Reference
 
 % desired link position
-q_ref = [pi/2 pi/2]';
+q_ref = [pi/4 pi/4]';
 
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
 % NB: assumiamo che il termine lineare domini per q-theta molto piccoli
@@ -53,7 +56,7 @@ x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 
 %% MPC parameters
 Ts = 1e-2;                              % integration step
-p = 10;                                 % control horizon
+p = 30;                                 % control horizon
 nlobj.Ts = Ts;
 nlobj.PredictionHorizon = p;       
 nlobj.ControlHorizon = p;       

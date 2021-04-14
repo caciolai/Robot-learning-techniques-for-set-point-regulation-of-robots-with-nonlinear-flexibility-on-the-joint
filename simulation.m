@@ -42,7 +42,7 @@ for ct = 1:(T/Ts)
     uHistory(:, ct) = mv;
     waitbar(ct*Ts/T,hbar);
 end
-close(hbar)
+close(hbar);
 
 %% Plot closed-loop response
 figure

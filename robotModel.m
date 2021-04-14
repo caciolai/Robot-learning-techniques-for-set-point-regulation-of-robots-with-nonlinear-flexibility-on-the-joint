@@ -11,7 +11,6 @@ addpath(genpath('./modelFunctions'));
 % q1 are the positions of the two links
 % q2 are the positions of the two motors
 
-
 tic
 n = 2;
 q = sym('q', [n, 1], 'real');
@@ -19,8 +18,9 @@ theta = sym('theta', [n, 1], 'real');
 q_dot = sym('q_dot', [n, 1], 'real');
 theta_dot = sym('theta_dot', [n, 1], 'real');
 
-g0 = 9.81;
-g = [0 g0 0]';
+g0 = 9.80665;
+% towards negative y values so that it affects planar robot
+g = [0 -g0 0]'; 
 disp("Symbolic environment set.");
 toc
 

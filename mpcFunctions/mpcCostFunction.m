@@ -1,5 +1,6 @@
 function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, x_ref, p)
-
+    
+ theta_ref = x_ref(3:4)';
  reference = ones(p,2) .* theta_ref;
  
  u = u(1:p,:);
