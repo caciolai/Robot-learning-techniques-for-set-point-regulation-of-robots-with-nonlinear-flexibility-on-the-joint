@@ -25,12 +25,14 @@ uHistory = zeros(nu, T/Ts);
 uHistory(:, 1) = u0;
 
 %% Simulate closed-loop system
-hbar = waitbar(0,'Simulation Progress');
+% hbar = waitbar(0,'Simulation Progress');
 for ct = 1:(T/Ts)
     tau_g = g(q_ref);
+    fprintf("t = %.4f\n", (ct-1)*Ts);
+    disp(xk');
     
     % Compute optimal control moves.
-    [mv,nloptions,info] = nlmpcmove(nlobj,xk,mv,x_ref,[],nloptions);
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,[],nloptions);
     
     tau = tau_g + mv;
     
@@ -39,10 +41,10 @@ for ct = 1:(T/Ts)
     
     % Save plant states for display.
     xHistory(:, ct) = xk;
-    uHistory(:, ct) = mv;
-    waitbar(ct*Ts/T,hbar);
+    uHistory(:, ct) = tau;
+%     waitbar(ct*Ts/T);
 end
-close(hbar);
+% close(hbar);
 
 %% Plot closed-loop response
 figure

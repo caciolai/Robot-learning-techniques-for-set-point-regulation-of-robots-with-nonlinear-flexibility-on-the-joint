@@ -7,8 +7,8 @@ function x_dot = stateFunctionCT(x,u,B,K1,K2)
     theta_dot = x(7:8);
     
     % Compute elastic term
-%     psi = linearElasticity(x, K1);
-    psi = nonlinearElasticity(x, K1, K2);
+    psi = linearElasticity(x, K1);
+%     psi = nonlinearElasticity(x, K1, K2);
 
     % Dynamic equations of 2R
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q));

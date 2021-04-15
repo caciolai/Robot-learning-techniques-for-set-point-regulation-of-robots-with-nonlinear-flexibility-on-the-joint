@@ -24,23 +24,23 @@ nx = 8; % number of state variables (q, theta, q_dot, theta_dot)
 ny = 8; % number of output variables (full state)
 nu = 2; % number of input variables (torques)
 
-nlobj = nlmpc(nx,ny,nu);
+nlmpcObj = nlmpc(nx,ny,nu);
 
 %% MPC model
 
 % prediction model
-nlobj.Model.StateFcn = "mpcStateFunctionDT"; 
+nlmpcObj.Model.StateFcn = "mpcStateFunctionDT"; 
 
-nlobj.Model.OutputFcn = "mpcOutputFunction";
+nlmpcObj.Model.OutputFcn = "mpcOutputFunction";
 
 %% MPC cost
 % Custom Cost function
-mpc.Optimization.CustomCostFcn = "mpcCostFunction";
-mpc.Optimization.ReplaceStandardCost = true;
+nlmpcObj.Optimization.CustomCostFcn = "mpcCostFunction";
+nlmpcObj.Optimization.ReplaceStandardCost = true;
 
 
 %% MPC constraints
-mpc.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
+% nlmpcObj.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
 
 %% Reference
 
@@ -57,18 +57,19 @@ x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 %% MPC parameters
 Ts = 1e-2;                              % integration step
 p = 30;                                 % control horizon
-nlobj.Ts = Ts;
-nlobj.PredictionHorizon = p;       
-nlobj.ControlHorizon = p;       
+m = 6;                                  % prediction horizon
+nlmpcObj.Ts = Ts;
+nlmpcObj.PredictionHorizon = p;       
+nlmpcObj.ControlHorizon = m;       
 
-params = {Ts, B, K1, K2, x_ref, p};
-nlobj.Model.IsContinuousTime = false;
-nlobj.Model.NumberOfParameters = length(params);
+params = {Ts, B, K1, K2, x_ref, m};
+nlmpcObj.Model.IsContinuousTime = false;
+nlmpcObj.Model.NumberOfParameters = length(params);
 
 nloptions = nlmpcmoveopt;
 nloptions.Parameters = params;
 
-mpc.Optimization.SolverOptions.Algorithm ='interior-point'; 
+nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
 
 %% Simulation parameters
 % simulation time
@@ -84,4 +85,6 @@ x0 = [q0; theta0; q0_dot; theta0_dot];
 u0 = [0; 0];
 
 %% Validate model
-validateFcns(nlobj,x0,u0,[],params);
+validateFcns(nlmpcObj,x0,u0,[],params);
+
+review(nlmpcObj);

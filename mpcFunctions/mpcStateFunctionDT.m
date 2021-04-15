@@ -1,10 +1,11 @@
-function x1 = mpcStateFunctionDT(x, u, Ts, B, K1, K2, x_ref, p)
+function x1 = mpcStateFunctionDT(x, u, Ts, B, K1, K2, x_ref, m)
 
-   % Repeat application of Euler method sampled at Ts/M.
-    M = 1;
-    delta = Ts/M;
-    x1 = x;
-    for ct=1:M
-        x1 = x1 + delta*mpcStateFunctionCT(x1, u, Ts, B, K1, K2, x_ref, p);
-    end
+%    % Repeat application of Euler method sampled at Ts/M.
+%     nIter = 1;
+%     delta = Ts/nIter;
+%     x1 = x;
+%     for ct=1:nIter
+%         x1 = x1 + delta*mpcStateFunctionCT(x1, u, Ts, B, K1, K2, x_ref, p);
+%     end
+    x1 = x + Ts*mpcStateFunctionCT(x, u, Ts, B, K1, K2, x_ref, m);
 end
