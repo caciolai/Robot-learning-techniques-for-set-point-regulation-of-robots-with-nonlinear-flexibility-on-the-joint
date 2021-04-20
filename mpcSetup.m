@@ -50,7 +50,7 @@ nlmpcObj.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
 %% Reference
 
 % desired link position
-q_ref = [pi/4 pi/4]';
+q_ref = [pi/2 pi/4]';
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
