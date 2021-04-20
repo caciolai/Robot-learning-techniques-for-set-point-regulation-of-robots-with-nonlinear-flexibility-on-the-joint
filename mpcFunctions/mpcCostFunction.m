@@ -1,36 +1,35 @@
-function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, x_ref, m)
+function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, D, x_ref, p)
+    
+    u = u(1:p,:);
+    x = x(2:p+1,:);
     
     theta_ref = x_ref(3:4);
-    reference = ones(m,2) .* theta_ref;
+    reference = ones(p,2) .* theta_ref;
     
-    q = x(:, 1:2);
     theta = x(:, 3:4);
-
-    u = u(1:m,:);
-    x = x(2:m+1,:);
+    theta_dot = x(:, 7:8);
 
     J = 0.0;
-    % COSTO TERMINALE
-    % somma dell'errore al quadrato tra reference del motore e posizione
-    % del motore
-    % imponiamo che alla fine della traiettoria theta sia uguale alla
-    % reference
+    
+    %% Terminal cost
+    k = 10;
+    
+    % negli ultimi k step forza le theta verso la reference
+    J = J + 100*(sum(sum(theta(end-k:end,:)-reference(end-k:end,:).^2,1),2));
+    
+    % negli ultimi k step forza le theta dot a zero (induci stabilità
+    % dell'equilibrio)
+    J = J + 100*(sum(sum(theta_dot(end-k:end,:).^2,1),2));
+    
+    % negli ultimi k step riduci il control effort
+    J = J + 100*(sum(sum(u(end-k:end,:).^2,1),2));
 
-    J = J + 100*(sum(x(end,3:4)-reference(end,1:2)).^2);
-
-    % imponiamo che gli ultimi k step della traiettoria theta_dot sia nullo
-    % per cercare di rendere stabile la configurazione di reference
-    k = 2;
-    J = J + 100*(sum(sum(x(end-k:end,7:8).^2,1),2));
-
-    %% FUNZIONE DI COSTO
-    for i=1:m-1
-    %         J = J + 1*sum((x(i,1:2)-reference(i,1:2)).^2);
-        J = J + 10*sum((x(i,3:4)-reference(i,1:2)).^2);
-        J = J + 1*sum((x(i,7:8)).^2);
-    %         J = J + 1*sum(u(i,:).^2);
-        J = J + 0.1*sum((u(i+1,:) - u(i,:)).^2); % minimizza il control effort
-
+    %% Stage cost
+    for i=1:p-1
+        J = J + 10*sum((theta(i,:)-reference(i,:)).^2);
+        J = J + 1*sum((theta_dot(i,:)).^2);
+%         J = J + 0.1*sum(u(i,:).^2);
+        J = J + 0.1*sum((u(i+1,:) - u(i,:)).^2);
     end
 
 end

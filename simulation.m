@@ -37,7 +37,7 @@ for ct = 1:(T/Ts)
     tau = tau_g + mv;
     
     % Implement first optimal control move and update plant states.
-    xk = stateFunctionDT(xk, tau, Ts, B, K1, K2);
+    xk = stateFunctionDT(xk, tau, Ts, B, K1, K2, D);
     
     % Save plant states for display.
     xHistory(:, ct) = xk;
