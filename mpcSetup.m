@@ -22,7 +22,6 @@ K2 = eye(2) * 10;
 D = eye(2) * 10; 
 
 %% Create nonlinear MPC object
-
 nx = 8; % number of state variables (q, theta, q_dot, theta_dot) 
 ny = 8; % number of output variables (full state)
 nu = 2; % number of input variables (torques)
@@ -30,7 +29,6 @@ nu = 2; % number of input variables (torques)
 nlmpcObj = nlmpc(nx,ny,nu);
 
 %% MPC model
-
 nlmpcObj.Model.StateFcn = "mpcStateFunctionDT"; 
 nlmpcObj.Model.OutputFcn = "mpcOutputFunction";
 
@@ -48,9 +46,8 @@ nlmpcObj.ManipulatedVariables(2).Max = +u_max;
 nlmpcObj.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
 
 %% Reference
-
 % desired link position
-q_ref = [pi/2 pi/4]';
+q_ref = [pi 0]';
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità

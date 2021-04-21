@@ -20,9 +20,9 @@ theta_ref = x_ref(3:4)';
 
 % to record history of simulation
 xHistory = zeros(nx, T/Ts);
-xHistory(1,:) = x0;
+xHistory(:,1) = x0;
 uHistory = zeros(nu, T/Ts);
-uHistory(1,:) = u0;
+uHistory(:,1) = u0;
 
 %% Simulate closed-loop system
 % hbar = waitbar(0,'Simulation Progress');
