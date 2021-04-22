@@ -20,7 +20,7 @@ D = eye(2) * 10;
 
 %% Reference
 % desired link position
-q_ref = [0 0]';
+q_ref = [pi/4 pi/4]';
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
@@ -82,82 +82,78 @@ e; % Closed loop eigenvalues (A-B*K)
 x0 = x_bar + [0.01; 0.01; 0.01; 0.01; 0; 0; 0; 0];
 Ts = 1e-2; 
 T = 10;
-xk = x0 - x_bar;
+xk = x0;
 tau_g = g(q_ref);
 
-[b,a] = ss2tf(A,B,eye(8),zeros(8,2))
+for ct = 1:(T/Ts)
+        
+    % Compute optimal lqr moves.
+    [K,S,e] = lqr(A,B,Q,R,N);
+    
+    tau = -K*(xk-x_bar) + tau_g;
+    
+    % Implement first optimal control move and update plant states.
+    q = [xk(1); xk(2)];              
+    theta = [xk(3); xk(4)];          
+    q_dot = [xk(5); xk(6)];           
+    theta_dot = [xk(7); xk(8)]; 
+    
+    xk(1) = xk(5)*Ts + xk(1);
+    xk(2) = xk(6)*Ts + xk(2);
+    xk(3) = xk(7)*Ts + xk(3);
+    xk(4) = xk(8)*Ts + xk(4);
+    
+    M_temp = M(q);
+    c_temp = c(q, q_dot);
+    g_temp = g(q);
+    psi_temp = subs(psi, [x1,x2,x3,x4], [xk(1),xk(2),xk(3),xk(4)]);
+    
+    xk(5:6) = M_temp\(-psi_temp - c_temp - g_temp -D*(q_dot-theta_dot))*Ts + xk(5:6);
+    xk(7:8) = B_motor\(psi_temp-D*(theta_dot-q_dot) + tau)*Ts + xk(7:8);
+    
+    % Save plant states for display.
+    xHistory(ct,:) = xk';
+    uHistory(ct,:) = tau';
+    
+end
 
+%% Plot
+t = linspace(0, T, T/Ts);
 
+figure
+subplot(2,2,1)
+hold on
+plot(t,xHistory(:,1))
+yline(q_ref(1), 'r-');
+xlabel('time')
+ylabel('q1')
+legend('q1', 'qd1');
+title('First link position')
 
-% for ct = 1:(T/Ts)
-%         
-%     % Compute optimal lqr moves.
-%     [K,S,e] = lqr(A,B,Q,R,N);
-%     
-%     tau = -K*xk + tau_g;
-%     
-%     % Implement first optimal control move and update plant states.
-%     q = [xk(1); xk(2)];              
-%     theta = [xk(3); xk(4)];          
-%     q_dot = [xk(5); xk(6)];           
-%     theta_dot = [xk(7); xk(8)]; 
-%     
-%     xk(1) = xk(5)*Ts + xk(1);
-%     xk(2) = xk(6)*Ts + xk(2);
-%     xk(3) = xk(7)*Ts + xk(3);
-%     xk(4) = xk(8)*Ts + xk(4);
-%     
-%     M_temp = M(q);
-%     c_temp = c(q, q_dot);
-%     g_temp = g(q);
-%     psi_temp = subs(psi, [x1,x2,x3,x4], [xk(1),xk(2),xk(3),xk(4)]);
-%     
-%     xk(5:6) = M_temp\(-psi_temp - c_temp - g_temp -D*(q_dot-theta_dot))*Ts + xk(5:6);
-%     xk(7:8) = B_motor\(psi_temp-D*(theta_dot-q_dot) + tau)*Ts + xk(7:8);
-%     
-%     % Save plant states for display.
-%     xHistory(ct,:) = xk';
-%     uHistory(ct,:) = tau';
-%     
-% end
-% 
-% %% Plot
-% t = linspace(0, T, T/Ts);
-% 
-% figure
-% subplot(2,2,1)
-% hold on
-% plot(t,xHistory(:,1))
-% yline(q_ref(1), 'r-');
-% xlabel('time')
-% ylabel('q1')
-% legend('q1', 'qd1');
-% title('First link position')
-% 
-% subplot(2,2,2)
-% hold on
-% plot(t,xHistory(:,2))
-% yline(q_ref(2), 'r-');
-% xlabel('time')
-% ylabel('q2')
-% legend('q2', 'qd2');
-% title('Second link position')
-% 
-% subplot(2,2,3)
-% hold on
-% plot(t,xHistory(:,3))
-% plot(t,xHistory(:,4))
-% xlabel('time')
-% ylabel('q_{dot}')
-% legend('q_{dot}_1', 'q_{dot}_2');
-% title('Link velocities')
-% 
-% subplot(2,2,4)
-% hold on
-% plot(t,uHistory(:,1))
-% plot(t,uHistory(:,2))
-% xlabel('time')
-% ylabel('tau')
-% legend('tau1', 'tau2');
-% title('Controlled torque')
-% 
+subplot(2,2,2)
+hold on
+plot(t,xHistory(:,2))
+yline(q_ref(2), 'r-');
+xlabel('time')
+ylabel('q2')
+legend('q2', 'qd2');
+title('Second link position')
+
+subplot(2,2,3)
+hold on
+plot(t,xHistory(:,3))
+plot(t,xHistory(:,4))
+xlabel('time')
+ylabel('q_{dot}')
+legend('q_{dot}_1', 'q_{dot}_2');
+title('Link velocities')
+
+subplot(2,2,4)
+hold on
+plot(t,uHistory(:,1))
+plot(t,uHistory(:,2))
+xlabel('time')
+ylabel('tau')
+legend('tau1', 'tau2');
+title('Controlled torque')
+

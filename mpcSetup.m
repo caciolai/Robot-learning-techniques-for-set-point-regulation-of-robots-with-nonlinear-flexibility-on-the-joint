@@ -47,7 +47,7 @@ nlmpcObj.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
 
 %% Reference
 % desired link position
-q_ref = [pi 0]';
+q_ref = [pi/4 pi/4]';
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
@@ -68,6 +68,39 @@ theta_ref = sol.x;
 % desired equilibrium (no velocity)
 x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 
+%% System linearization and LQR
+syms x [8 1] 'real'         % x1 = q1
+                            % x2 = q2
+                            % x3 = theta1
+                            % x4 = theta2
+q = [x1; x2];               % x5 = q1_dot
+theta = [x3; x4];           % x6 = q2_dot
+q_dot = [x5; x6];           % x7 = theta1_dot
+theta_dot = [x7; x8];       % x8 = theta2_dot            
+
+%     psi = linearElasticity(x, K1);
+psi = nonlinearElasticity(x, K1, K2);
+
+% Vector fields
+fx = [q_dot; theta_dot; M(q)\(-psi - c(q, q_dot) - g(q) -D*(q_dot-theta_dot)); B\(psi-D*(theta_dot-q_dot))];
+gx = [zeros(6,2); inv(B)];
+
+x_bar = x_ref';  % Equilibrium point
+% u_bar = 0
+
+A_sys = double(subs(jacobian(fx,x), x, x_bar));
+B_sys = double(subs(gx, x, x_bar));
+
+% Weight matrices
+Q = eye(8);           % to be tuned
+Q(1:4, 1:4) = diag([10,10, 1,1]);
+Q(5:8, 5:8) = zeros(4,4);
+R = eye(2);           % to be tuned 
+N = zeros(8,2);
+
+% lqr for terminal cost
+[~,S,~] = lqr(A_sys,B_sys,Q,R,N);
+
 %% MPC parameters
 Ts = 1e-2;                              % integration step
 p = 100;                                 % control/prediction horizon
@@ -75,7 +108,7 @@ nlmpcObj.Ts = Ts;
 nlmpcObj.PredictionHorizon = p;       
 nlmpcObj.ControlHorizon = p;       
 
-params = {Ts, B, K1, K2, D, x_ref, p};
+params = {Ts, B, K1, K2, D, x_ref, p, S};
 nlmpcObj.Model.IsContinuousTime = false;
 nlmpcObj.Model.NumberOfParameters = length(params);
 

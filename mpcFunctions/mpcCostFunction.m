@@ -1,4 +1,4 @@
-function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, D, x_ref, p)
+function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, D, x_ref, p, S)
     
     u = u(1:p,:);
     x = x(2:p+1,:);
@@ -23,6 +23,8 @@ function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, D, x_ref, p)
     
     % negli ultimi k step riduci il control effort
     J = J + 100*(sum(sum(u(end-k:end,:).^2,1),2));
+    
+    J = J + x_ref*S*x_ref'; % trasposto perché è un row vector
 
     %% Stage cost
     for i=1:p-1

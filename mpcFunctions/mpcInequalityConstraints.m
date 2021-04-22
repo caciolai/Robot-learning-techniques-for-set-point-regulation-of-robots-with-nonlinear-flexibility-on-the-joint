@@ -1,4 +1,4 @@
-function cineq = mpcInequalityConstraints(x, u, e, data, Ts, B, K1, K2, D, x_ref, p)
+function cineq = mpcInequalityConstraints(x, u, e, data, Ts, B, K1, K2, D, x_ref, p, S)
     %Function that returns a vector of values, one for each inequality
     %constraints, satisfied if the value is less than 0
     
