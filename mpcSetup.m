@@ -28,24 +28,8 @@ nu = 2; % number of input variables (torques)
 
 nlmpcObj = nlmpc(nx,ny,nu);
 
-%% MPC model
-nlmpcObj.Model.StateFcn = "mpcStateFunctionDT"; 
-nlmpcObj.Model.OutputFcn = "mpcOutputFunction";
+%% Simulation parameters
 
-%% MPC cost
-nlmpcObj.Optimization.CustomCostFcn = "mpcCostFunction";
-nlmpcObj.Optimization.ReplaceStandardCost = true;
-
-u_max = 1000;
-nlmpcObj.ManipulatedVariables(1).Min = -u_max;
-nlmpcObj.ManipulatedVariables(1).Max = +u_max;
-nlmpcObj.ManipulatedVariables(2).Min = -u_max;
-nlmpcObj.ManipulatedVariables(2).Max = +u_max;
-
-%% MPC constraints
-nlmpcObj.Optimization.CustomIneqConFcn = "mpcInequalityConstraints";
-
-%% Reference
 % desired link position
 q_ref = [pi/4 pi/4]';
 
@@ -67,6 +51,18 @@ theta_ref = sol.x;
 
 % desired equilibrium (no velocity)
 x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
+
+% simulation time
+T = 10.0; % [s]
+
+% initial configuration
+q0 = [0; 0];
+theta0 = q0;
+q0_dot = [0; 0];
+theta0_dot = q0_dot;
+
+x0 = [q0; theta0; q0_dot; theta0_dot];
+u0 = [0; 0];
 
 %% System linearization and LQR
 syms x [8 1] 'real'         % x1 = q1
@@ -108,28 +104,44 @@ nlmpcObj.Ts = Ts;
 nlmpcObj.PredictionHorizon = p;       
 nlmpcObj.ControlHorizon = p;       
 
-params = {Ts, B, K1, K2, D, x_ref, p, S};
-nlmpcObj.Model.IsContinuousTime = false;
-nlmpcObj.Model.NumberOfParameters = length(params);
+% li passo "sotto banco"
+params.Ts = Ts;
+params.B = B;
+params.K1 = K1;
+params.K2 = K2;
+params.D = D;
+params.x_ref = x_ref;
+params.p = p;
+params.S = S;
 
-nloptions = nlmpcmoveopt;
-nloptions.Parameters = params;
+nlmpcObj.Model.IsContinuousTime = false;
+nlmpcObj.Model.NumberOfParameters = 0;
 
 % nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
 nlmpcObj.Optimization.SolverOptions.MaxIterations = 400;
 
-%% Simulation parameters
-% simulation time
-T = 10.0; % [s]
+%% MPC model
+nlmpcObj.Model.StateFcn = ...
+    @(x, u) mpcStateFunctionDT(x, u, params); 
+nlmpcObj.Model.OutputFcn = ...
+    @(x, u) mpcOutputFunction(x, u, params);
 
-% initial configuration
-q0 = [0; 0];
-theta0 = q0;
-q0_dot = [0; 0];
-theta0_dot = q0_dot;
+%% MPC cost
+nlmpcObj.Optimization.CustomCostFcn = ...
+    @(x,u,e,data) mpcCostFunction(x,u,e,data,params);
 
-x0 = [q0; theta0; q0_dot; theta0_dot];
-u0 = [0; 0];
+nlmpcObj.Optimization.ReplaceStandardCost = true;
+
+u_max = 1000;
+nlmpcObj.ManipulatedVariables(1).Min = -u_max;
+nlmpcObj.ManipulatedVariables(1).Max = +u_max;
+nlmpcObj.ManipulatedVariables(2).Min = -u_max;
+nlmpcObj.ManipulatedVariables(2).Max = +u_max;
+
+%% MPC constraints
+nlmpcObj.Optimization.CustomIneqConFcn = ...
+    @(x,u,e,data) mpcInequalityConstraints(x,u,e,data,params);
+
 
 %% Validate model
-validateFcns(nlmpcObj,x0,u0,[],params);
+validateFcns(nlmpcObj,x0,u0);

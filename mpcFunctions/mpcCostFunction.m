@@ -1,5 +1,10 @@
-function J = mpcCostFunction(x, u, e, data, Ts, B, K1, K2, D, x_ref, p, S)
+function J = mpcCostFunction(x, u, e, data, params)
     
+    % Unpack parameters
+    x_ref = params.x_ref;
+    p = params.p;
+    S = params.S;
+
     u = u(1:p,:);
     x = x(2:p+1,:);
     

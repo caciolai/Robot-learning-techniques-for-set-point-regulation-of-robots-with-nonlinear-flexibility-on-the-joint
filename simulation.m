@@ -32,12 +32,12 @@ uHistory(:,1) = u0;
 %     disp(xk');
 %     
 %     % Compute optimal control moves.
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,[],nloptions);
+%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
 %     
 %     tau = tau_g + mv;
 %     
 %     % Implement first optimal control move and update plant states.
-%     xk = stateFunctionDT(xk, tau, Ts, B, K1, K2, D);
+%     xk = stateFunctionDT(xk, tau, params);
 %     
 %     % Save plant states for display.
 %     xHistory(ct,:) = xk';
@@ -47,7 +47,7 @@ uHistory(:,1) = u0;
 % % close(hbar);
 
 tau_g = g(q_ref);
-[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,[],nloptions);
+[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
 xHistory = info.Xopt;
 uHistory = info.MVopt;
 

@@ -1,5 +1,11 @@
-function x_dot = stateFunctionCT(x, u, B, K1, K2, D)
+function x_dot = stateFunctionCT(x, u, params)
 
+    % Unpack parameters
+    B = params.B;
+    K1 = params.K1;
+    K2 = params.K2; 
+    D = params.D;
+    
     % Unpack state variables
     q = x(1:2);
     theta = x(3:4);

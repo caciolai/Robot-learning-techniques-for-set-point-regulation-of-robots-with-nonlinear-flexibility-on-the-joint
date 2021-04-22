@@ -1,4 +1,11 @@
-function x_dot = mpcStateFunctionCT(x, u, Ts, B, K1, K2, D, x_ref, p, S)
+function x_dot = mpcStateFunctionCT(x, u, params)
+
+    % Unpack params
+    B = params.B;
+    K1 = params.K1;
+    K2 = params.K2;
+    D = params.D;
+    x_ref = params.x_ref;
 
     % Unpack state variables
     q = x(1:2);
