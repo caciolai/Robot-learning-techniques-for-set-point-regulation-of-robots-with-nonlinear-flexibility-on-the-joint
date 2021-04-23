@@ -10,13 +10,19 @@ addpath(genpath('./modelFunctions'));
 
 % Coefficients for motor equation
 nLinks = 2;
-rg = 50; % Gear reduction ratio
-Im_zz = 0.015; % Motor inertia 
-B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
+% rg = 50; % Gear reduction ratio
+% Im_zz = 0.015; % Motor inertia 
+% B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
+
+B = eye(2);
+
+% Damping
+D = eye(2) * 10; 
+D = zeros(2,2) * 10;
 
 % Nonlinear elasticity: k1(q-theta)+k2(q-theta)^3
-k1=2.5e2; 
-k2=1e2;
+k1=1e3; 
+k2=10;
 
 % Gains for PD to generate data
 Kp=diag([40,40]);
@@ -36,7 +42,7 @@ q_in = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 q_fin = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 
 % Reduction step to undersample trajectories
-reductionStep = 1;
+reductionStep = 10;
 nSamplesFull = T*(1/Ts);
 nSamples = nSamplesFull/reductionStep;
 
@@ -63,7 +69,7 @@ for i=1:nTrajectories
     
     [qd, qd_dot,qd_ddot] = get_Trajectory_Desired(q0, q0_dot, q0_ddot, qf, qf_dot, qf_ddot,T,Ts,nLinks);
     
-    data = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_ddot, T, Ts, nLinks, Kp, Kd, B, k1, k2);
+    data = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_ddot, T, Ts, nLinks, Kp, Kd, B, k1, k2, D);
     
     x = data(1:4,:); % [q, theta]
     y = data(5:6,:); % elastic terms

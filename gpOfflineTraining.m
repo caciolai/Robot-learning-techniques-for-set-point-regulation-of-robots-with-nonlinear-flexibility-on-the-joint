@@ -8,14 +8,14 @@ disp("Loading data...");
 load('data.mat');
 dataset = [input; output];
 
-% rng('default') % For reproducibility
+rng('default') % For reproducibility
 cols = size(dataset,2);
 disp("Done.");
 
 %% Prepare dataset for training
-% % Shuffle data columns (Meglio farlo solo sul training set?)
-% index = randperm(cols);
-% dataset = dataset(:,index);
+% Shuffle data columns (Meglio farlo solo sul training set?)
+index = randperm(cols);
+dataset = dataset(:,index);
 
 disp("Preparing dataset...");
 % 80% training 20% test
