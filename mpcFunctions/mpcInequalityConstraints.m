@@ -3,10 +3,11 @@ function cineq = mpcInequalityConstraints(x, u, e, data, params)
     %constraints, satisfied if the value is less than 0
     
     x_ref = params.x_ref;
-
-     C1 =  abs(x(end-10:end,3) - x_ref(1)) - 0.01;
-     C2 =  abs(x(end-10:end,4) - x_ref(2)) - 0.01;
-     cineq = [C1;C2];
+    k = 10;
+     
+    C1 =  abs(x(end-k:end,3) - x_ref(1)) - 0.01;
+    C2 =  abs(x(end-k:end,4) - x_ref(2)) - 0.01;
+    cineq = [C1;C2];
     
 end
 

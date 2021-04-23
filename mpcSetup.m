@@ -97,9 +97,12 @@ N = zeros(8,2);
 % lqr for terminal cost
 [~,S,~] = lqr(A_sys,B_sys,Q,R,N);
 
+%% Load GP model trained offline
+load('gpMdl.mat');
+
 %% MPC parameters
 Ts = 1e-2;                              % integration step
-p = 100;                                 % control/prediction horizon
+p = 100;                                % control/prediction horizon
 nlmpcObj.Ts = Ts;
 nlmpcObj.PredictionHorizon = p;       
 nlmpcObj.ControlHorizon = p;       
@@ -113,6 +116,7 @@ params.D = D;
 params.x_ref = x_ref;
 params.p = p;
 params.S = S;
+params.gpMdl = gpMdl;
 
 nlmpcObj.Model.IsContinuousTime = false;
 nlmpcObj.Model.NumberOfParameters = 0;

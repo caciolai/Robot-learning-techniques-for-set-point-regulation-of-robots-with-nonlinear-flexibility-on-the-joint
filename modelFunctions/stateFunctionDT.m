@@ -1,5 +1,5 @@
 function x1 = stateFunctionDT(x, u, params)
-
+    Ts = params.Ts;
 %    % Repeat application of Euler method sampled at Ts/M.
 %     nIter = 1;
 %     delta = Ts/nIter;

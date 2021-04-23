@@ -72,6 +72,6 @@ set(findall(gcf,'type','line'),'linewidth',1);
 
 %% Save model
 
-gpMdl = {gpMdl_1;gpMdl_2};
+gpMdl = {compact(gpMdl_1);compact(gpMdl_2)};
 save('gpMdl.mat', 'gpMdl');
 disp("Model saved.");

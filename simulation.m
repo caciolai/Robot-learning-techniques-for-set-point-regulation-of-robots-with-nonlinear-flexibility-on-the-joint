@@ -19,10 +19,10 @@ q_ref = x_ref(1:2)';
 theta_ref = x_ref(3:4)';
 
 % to record history of simulation
-xHistory = zeros(nx, T/Ts);
-xHistory(:,1) = x0;
-uHistory = zeros(nu, T/Ts);
-uHistory(:,1) = u0;
+xHistory = zeros(T/Ts,nx);
+xHistory(1,:) = x0;
+uHistory = zeros(T/Ts,nu);
+uHistory(1,:) = u0;
 
 %% Simulate closed-loop system
 % hbar = waitbar(0,'Simulation Progress');
@@ -30,24 +30,27 @@ uHistory(:,1) = u0;
 %     tau_g = g(q_ref);
 %     fprintf("t = %.4f\n", (ct-1)*Ts);
 %     disp(xk');
-%     
-%     % Compute optimal control moves.
+    
+    % Compute optimal control moves.
 %     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-%     
+%     mv = 0;
 %     tau = tau_g + mv;
-%     
-%     % Implement first optimal control move and update plant states.
+    
+    % Implement first optimal control move and update plant states.
 %     xk = stateFunctionDT(xk, tau, params);
-%     
-%     % Save plant states for display.
+%     xk = mpcStateFunctionDT(xk, tau, params);
+    
+    % Save plant states for display.
 %     xHistory(ct,:) = xk';
 %     uHistory(ct,:) = tau';
-% %     waitbar(ct*Ts/T);
+%     waitbar(ct*Ts/T);
 % end
-% % close(hbar);
+% close(hbar);
 
 tau_g = g(q_ref);
+tic
 [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
+toc
 xHistory = info.Xopt;
 uHistory = info.MVopt;
 
