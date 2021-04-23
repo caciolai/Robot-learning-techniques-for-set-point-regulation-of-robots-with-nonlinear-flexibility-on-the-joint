@@ -18,7 +18,6 @@ B = eye(2);
 
 % Damping
 D = eye(2) * 10; 
-D = zeros(2,2) * 10;
 
 % Nonlinear elasticity: k1(q-theta)+k2(q-theta)^3
 k1=1e3; 
@@ -32,7 +31,7 @@ Kd=Kp/10;
 T = 1;      % Final time instant
 Ts = 1e-3;  % Integration step                   
 
-plotting = true;
+plotting = false;
 
 %% DATA GENERATION for multiple trajectories
 
@@ -73,6 +72,7 @@ for i=1:nTrajectories
     
     x = data(1:4,:); % [q, theta]
     y = data(5:6,:); % elastic terms
+    y_real = data(7:8,:);
     
     trajStartStep = (i-1)*(T*(1/Ts))+1;
     trajEndStep = i*(T*(1/Ts));

@@ -23,13 +23,13 @@ function [data] = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_dotdot,
         q_dot(:,i+1) = T*(M(q(:,i))\(-psi_real(:, i) - c(q(:,i),q_dot(:,i)) - g(q(:,i) - D*q_dot(:,i)))) + q_dot(:,i);
         theta_dot(:,i+1) = T*(B\(u(:,i) + psi_real(:, i) - D*theta_dot(:,i))) + theta_dot(:,i);
         theta_ddot(:,i+1)=(theta_dot(:,i+1)-theta_dot(:,i))/T; %euler derivative
-        psi(:,i)=B*theta_ddot(:,i+1)-u(:,i);
+        psi(:,i)=B*theta_ddot(:,i+1)+D*theta_dot(:,i)-u(:,i);
     end
     
     x=[q; theta]; % 4xN ; N=number of sampled points
     y=[psi];     % 2xN
     
-    data=[x;y];  % 6xN
+    data=[x;y;psi_real];  % 6xN
     
     
 end
