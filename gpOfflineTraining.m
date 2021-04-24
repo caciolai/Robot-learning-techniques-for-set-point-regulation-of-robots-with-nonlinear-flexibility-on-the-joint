@@ -1,7 +1,4 @@
 %% GP MODEL OFFLINE TRAINING
-close all;
-clear all;
-clc;
 
 %% Load data
 disp("Loading data...");

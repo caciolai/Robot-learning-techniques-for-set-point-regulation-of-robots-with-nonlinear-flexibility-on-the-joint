@@ -7,9 +7,21 @@ addpath(genpath('./utils'));
 addpath(genpath('./modelFunctions'));
 addpath(genpath('./mpcFunctions'));
 
-%% Load model and setup mpc
-% robotModel;
+%% Load parameters, model and setup mpc
+robotModel;
 mpcSetup;
+
+x0 = simParams.x0;
+u0 = simParams.u0;
+T = simParams.T;
+Ts = simParams.Ts;
+x_ref = simParams.x_ref;
+
+nx = nlmpcObj.Dimensions.NumberOfStates;
+nu = nlmpcObj.Dimensions.NumberOfInputs;
+ny = nlmpcObj.Dimensions.NumberOfOutputs;
+
+p = mpcParams.p;
 
 %% Initialize simulation
 mv = u0;
@@ -65,8 +77,8 @@ hold on
 plot(t,xHistory(:,1))
 yline(q_ref(1), 'r-');
 xlabel('time')
-ylabel('q1')
-legend('q1', 'qd1');
+ylabel('$q_1$', 'Interpreter', 'latex')
+legend('$q_1$', '$q_1^d$', 'Interpreter', 'latex');
 title('First link position')
 
 subplot(2,2,2)
@@ -74,8 +86,8 @@ hold on
 plot(t,xHistory(:,2))
 yline(q_ref(2), 'r-');
 xlabel('time')
-ylabel('q2')
-legend('q2', 'qd2');
+ylabel('$q_2$', 'Interpreter', 'latex')
+legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex');
 title('Second link position')
 
 subplot(2,2,3)
@@ -83,8 +95,8 @@ hold on
 plot(t,xHistory(:,3))
 plot(t,xHistory(:,4))
 xlabel('time')
-ylabel('q_{dot}')
-legend('q_{dot}_1', 'q_{dot}_2');
+ylabel('$\dot{q}$', 'Interpreter', 'latex')
+legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
 title('Link velocities')
 
 subplot(2,2,4)
@@ -92,6 +104,6 @@ hold on
 plot(t,uHistory(:,1))
 plot(t,uHistory(:,2))
 xlabel('time')
-ylabel('tau')
-legend('tau1', 'tau2');
+ylabel('$\tau$', 'Interpreter', 'latex')
+legend('$\tau_1$', '$\tau_2$', 'Interpreter', 'latex');
 title('Controlled torque')

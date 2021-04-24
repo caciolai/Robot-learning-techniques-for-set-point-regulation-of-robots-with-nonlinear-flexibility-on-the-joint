@@ -1,35 +1,24 @@
 %% n-R PLANAR JOINT ROBOT MODEL under gravity
-clear all;
-close all;
-clc;
-
 addpath(genpath('./utils'));
 addpath(genpath('./modelFunctions'));
+parameters;
 
 %% Declaration of symbolic variables
 % The state q can be partioned in (q1, q2) where 
 % q1 are the positions of the two links
 % q2 are the positions of the two motors
 
-tic
-n = 2;
-q = sym('q', [n, 1], 'real');
-theta = sym('theta', [n, 1], 'real');
-q_dot = sym('q_dot', [n, 1], 'real');
-theta_dot = sym('theta_dot', [n, 1], 'real');
-
-g0 = 9.80665;
-% towards negative y values so that it affects planar robot
-g = [0 -g0 0]'; 
-disp("Symbolic environment set.");
-toc
+q = sym('q', [nLinks, 1], 'real');
+theta = sym('theta', [nLinks, 1], 'real');
+q_dot = sym('q_dot', [nLinks, 1], 'real');
+theta_dot = sym('theta_dot', [nLinks, 1], 'real');
 
 %% DYNAMIC PARAMETERS
-m = ones([n 1]); % masses
-l = ones([n 1]); % link lengths
-d = 0.4*ones([n 1]); % distance (>0) of the center of mass from O_RF_i
-I = zeros(3,3,n); % the n inertia matrices
-for k=1:n
+m = ones([nLinks 1]); % masses
+l = ones([nLinks 1]); % link lengths
+d = 0.4*ones([nLinks 1]); % distance (>0) of the center of mass from O_RF_i
+I = zeros(3,3,nLinks); % the n inertia matrices
+for k=1:nLinks
     I(:,:,k) = eye(3);
 end
 
@@ -42,13 +31,9 @@ DH_table = [
     0,      0,      l(2),   q(2)
 ];
 
-
-% disp("The Denavit-Hartenberg table for the robot is:");
-% disp(DH_table);
-
 % Ai homogeneous transformation matrix from RF_{i-1} to RF_i
-A = zeros([4 4 n], 'sym');
-for i=1:n
+A = zeros([4 4 nLinks], 'sym');
+for i=1:nLinks
     alpha_i = DH_table(i, 1);
     a_i = DH_table(i, 2);
     d_i = DH_table(i, 3);
@@ -57,8 +42,8 @@ for i=1:n
 end
 
 % Rotation matrices
-R = zeros([3 3 n], 'sym');
-for i=1:n
+R = zeros([3 3 nLinks], 'sym');
+for i=1:nLinks
     R(:, :, i) = A(1:3, 1:3, i);
 end
 
@@ -71,9 +56,9 @@ rc(:, 2) = [-d(2) 0 0]';
 
 
 % Positions of CoM_i expressed in RF_0
-rc0 = zeros([3 n], 'sym');
+rc0 = zeros([3 nLinks], 'sym');
 A0i = eye(4);
-for i=1:n
+for i=1:nLinks
     A0i = A0i * A(:, :, i);
     rc0_i_hom = A0i * [rc(:, i); 1];
     rc0(:, i) = rc0_i_hom(1:3);
@@ -101,7 +86,7 @@ T = 0; % kinetic energy of the links
 % constant z vector
 z = [0 0 1]';
 disp("Deriving kinetic energy of the links...");
-for i = 1:n
+for i = 1:nLinks
     Ri = R(:, :, i);    % Rotation matrix from RF_{i-1} to RF_i
     ri = r(:, i);       % Distance of RF_i from RF_{i-1} expressed in RF_i
     rci = rc(:, i);     % Position of CoM of link i expressed in RF_i
@@ -135,8 +120,8 @@ toc
 tic
 U_g = 0;
 disp("Deriving gravitational potential energy...");
-for i = 1:n
-    U_gi = -m(i) * (g' * rc0(:, i));
+for i = 1:nLinks
+    U_gi = -m(i) * (g0' * rc0(:, i));
     U_g = U_g + U_gi;
 end
 disp("Done.");
@@ -148,9 +133,9 @@ toc
 % Extract entries of inertia matrix
 tic
 disp("Deriving rigid manipulator inertia matrix...");
-M = zeros([n n], 'sym');
-for i = 1:n
-    for j = 1:n
+M = zeros([nLinks nLinks], 'sym');
+for i = 1:nLinks
+    for j = 1:nLinks
         % T = 1/2 q_dot' M q_dot = sum_i sum_j M
         % therefore to extract M_ij we 
         M(i,j) = diff(diff(T,q_dot(i)),q_dot(j));
@@ -164,11 +149,11 @@ toc
 %% Derivation of the model: Rigid manipulator Coriolis term
 tic
 disp("Deriving Coriolis and centrifugal term...");
-C = zeros([n 1], 'sym');
-for k=1:n
+C = zeros([nLinks 1], 'sym');
+for k=1:nLinks
     C_k = 0;
-    for i=1:n
-        for j=1:n
+    for i=1:nLinks
+        for j=1:nLinks
             c_kij = (1/2)*(diff(M(k, j), q(i)) + diff(M(k, i), q(j)) - diff(M(i, j), q(k)));
             C_k = C_k + (c_kij * q_dot(i) * q_dot(j));
         end
@@ -181,11 +166,11 @@ toc
 %% Derivation of the model: Rigid manipulator Coriolis factorization matrix
 tic
 disp("Deriving Coriolis factorization matrix...");
-S = zeros([n n], 'sym');
-for k=1:n
-    for j=1:n
+S = zeros([nLinks nLinks], 'sym');
+for k=1:nLinks
+    for j=1:nLinks
         S_kj = 0;
-        for i=1:n
+        for i=1:nLinks
            c_kij = (1/2)*( diff(M(k, j), q(i)) + diff(M(k, i), q(j)) - diff(M(i, j), q(k)));
            S_kj = S_kj + (c_kij * q_dot(i));
         end
@@ -208,7 +193,7 @@ toc
 disp("Checking consistency...");
 
 % symbolic x to check for things
-syms x [n 1] real
+syms x [nLinks 1] real
 
 % Check that M is symmetric
 check = simplify(M - M', 'steps', 100);
@@ -235,7 +220,7 @@ else
 end
 
 % Check that M_nn is constant
-check = simplify(norm(jacobian(M(n, n), q)));
+check = simplify(norm(jacobian(M(nLinks, nLinks), q)));
 if (check == 0)
     disp("M_nn is constant... OK!");
 else
@@ -245,7 +230,7 @@ end
 
 % Check that C(q, dq) = S(q, dq) dq
 check = simplify(C - S*q_dot, 'steps', 100);
-if (check == zeros(n, 1))
+if (check == zeros(nLinks, 1))
     disp("Coriolis factorization... OK!");
 else
     disp("Coriolis factorization... NOT OK!");
@@ -261,8 +246,8 @@ end
 
 % Check that M_ij is a function of at most (q_k+1, ..., q_n) for k=min(i,j)
 check = 0;
-for i=1:n
-    for j=1:n
+for i=1:nLinks
+    for j=1:nLinks
         Mij = M(i,j);
         k = min(i, j);
         for l=1:k
@@ -308,3 +293,7 @@ matlabFunction(G, 'Vars', {q}, 'File', ['modelFunctions/','g'], 'Optimize', true
 
 disp("Done.");
 toc
+
+%% Cleanup
+clear all;
+close all;

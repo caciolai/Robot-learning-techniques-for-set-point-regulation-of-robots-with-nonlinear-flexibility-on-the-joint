@@ -1,48 +1,20 @@
 %% GENERATION OF DATA TO TRAIN OFFLINE THE GP ON THE ELASTIC TERM
-clear all;
-close all;
-clc
 
 addpath(genpath('./utils'));
 addpath(genpath('./modelFunctions'));
 
 %% Parameters 
-
-% Coefficients for motor equation
-nLinks = 2;
-% rg = 50; % Gear reduction ratio
-% Im_zz = 0.015; % Motor inertia 
-% B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
-
-B = eye(2);
-
-% Damping
-D = eye(2) * 10; 
-
-% Nonlinear elasticity: k1(q-theta)+k2(q-theta)^3
-k1=1e3; 
-k2=10;
-
-% Gains for PD to generate data
-Kp=diag([40,40]);
-Kd=Kp/10;
-
-% Time
-T = 1;      % Final time instant
-Ts = 1e-3;  % Integration step                   
-
-plotting = false;
+parameters;
+plotting = true;
 
 %% DATA GENERATION for multiple trajectories
 
 % Planning smooth trajectories for multiple random initial and final
-nTrajectories = 10;
 q_in = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 q_fin = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 
 % Reduction step to undersample trajectories
-reductionStep = 10;
-nSamplesFull = T*(1/Ts);
+nSamplesFull = dgT*(1/dgTs);
 nSamples = nSamplesFull/reductionStep;
 
 output_full=zeros(nLinks, nSamplesFull*nTrajectories);
@@ -66,9 +38,9 @@ for i=1:nTrajectories
     qf_dot  = [0;0];
     qf_ddot = [0;0];
     
-    [qd, qd_dot,qd_ddot] = get_Trajectory_Desired(q0, q0_dot, q0_ddot, qf, qf_dot, qf_ddot,T,Ts,nLinks);
+    [qd, qd_dot,qd_ddot] = get_Trajectory_Desired(q0, q0_dot, q0_ddot, qf, qf_dot, qf_ddot,dgT,dgTs,nLinks);
     
-    data = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_ddot, T, Ts, nLinks, Kp, Kd, B, k1, k2, D);
+    data = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_ddot, dgT, dgTs, B, K1, K2, D);
     
     x = data(1:4,:); % [q, theta]
     y = data(5:6,:); % elastic terms
@@ -109,4 +81,5 @@ close(bar);
 %% Cleanup
 close all;
 save('data.mat','input','output');
+clear all;
     
