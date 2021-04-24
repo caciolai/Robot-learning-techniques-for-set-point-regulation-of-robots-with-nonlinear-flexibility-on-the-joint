@@ -21,13 +21,20 @@ function x_dot = mpcStateFunctionCT(x, u, params)
 
     % Compute elastic term
 %     psi = linearElasticity(x, K1);
-    psi = nonlinearElasticity(x, K1, K2);
-    %% Using gp prediction
-%     [psi_pred_1,~,~] = predict(gpMdl{1}, [q;theta]');
-%     [psi_pred_2,~,~] = predict(gpMdl{2}, [q;theta]');
-%     psi = [psi_pred_1;psi_pred_2];
+    psi_real = nonlinearElasticity(x, K1, K2);
     
-%     disp((psi_real - psi)'*(psi_real - psi));
+    %% Using gp prediction
+    [psi_pred_1,~,~] = predict(gpMdl{1}, [q;theta]');
+    [psi_pred_2,~,~] = predict(gpMdl{2}, [q;theta]');
+    psi = [psi_pred_1;psi_pred_2];
+    
+    error = psi_real - psi;
+    
+    if error(1) > 1 || error(2) > 1
+        disp(error)
+        disp('Bad GP')
+    end   
+    
 
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot);
     theta_ddot = B\(psi + u + u_nominal -D*theta_dot);

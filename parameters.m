@@ -44,8 +44,8 @@ Ts = 1e-2;   % Integration step
 dgT = 1;
 dgTs = 1e-3;
 
-nTrajectories = 10;
-reductionStep = 10;
+nTrajectories = 500;
+reductionStep = 20;
 
 %% MPC parameters
 

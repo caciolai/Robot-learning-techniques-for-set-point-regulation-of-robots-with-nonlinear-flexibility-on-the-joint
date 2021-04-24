@@ -5,13 +5,33 @@ addpath(genpath('./modelFunctions'));
 
 %% Parameters 
 parameters;
-plotting = true;
+plotting = false;
 
 %% DATA GENERATION for multiple trajectories
 
 % Planning smooth trajectories for multiple random initial and final
 q_in = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 q_fin = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
+
+figure(1)
+% To check if the configuration space is covered
+hold on
+for i=1:nTrajectories
+    plot(q_in(1,i), q_in(2,i), 'o')
+end
+xlim([-pi, pi]);
+ylim([-pi, pi]);
+
+figure(2)
+% To check if the configuration space is covered
+hold on
+for i=1:nTrajectories
+    plot(q_fin(1,i), q_fin(2,i), '+')
+end
+xlim([-pi, pi]);
+ylim([-pi, pi]);
+
+
 
 % Reduction step to undersample trajectories
 nSamplesFull = dgT*(1/dgTs);
@@ -62,6 +82,7 @@ for i=1:nTrajectories
     
     % Plotting
     if plotting
+        
         figure(i)
         hold on
         grid on
