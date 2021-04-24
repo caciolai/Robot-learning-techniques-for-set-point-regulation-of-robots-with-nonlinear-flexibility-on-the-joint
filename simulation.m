@@ -8,7 +8,7 @@ addpath(genpath('./modelFunctions'));
 addpath(genpath('./mpcFunctions'));
 
 %% Load parameters, model and setup mpc
-robotModel;
+% robotModel;
 mpcSetup;
 
 x0 = simParams.x0;
