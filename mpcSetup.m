@@ -10,15 +10,7 @@ nu = 2; % number of input variables (torques)
 
 nlmpcObj = nlmpc(nx,ny,nu);
 
-%% MPC parameters
-% nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
-nlmpcObj.Optimization.SolverOptions.MaxIterations = mpcMaxIterations;
-
-nlmpcObj.Model.IsContinuousTime = false;
-nlmpcObj.Ts = Ts;
-nlmpcObj.PredictionHorizon = controlHorizon;       
-nlmpcObj.ControlHorizon = controlHorizon;  
-nlmpcObj.Model.NumberOfParameters = 0;
+%% Plan trajectory
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
@@ -38,6 +30,17 @@ theta_ref = sol.x;
 
 % desired equilibrium (no velocity)
 x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
+
+%% MPC parameters
+% nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
+nlmpcObj.Optimization.SolverOptions.MaxIterations = mpcParams.maxIterations;
+
+nlmpcObj.Model.IsContinuousTime = false;
+nlmpcObj.Ts = Ts;
+nlmpcObj.PredictionHorizon = controlHorizon;       
+nlmpcObj.ControlHorizon = controlHorizon;  
+nlmpcObj.Model.NumberOfParameters = 0;
+
 mpcParams.x_ref = x_ref; 
 simParams.x_ref = x_ref;
 

@@ -35,7 +35,7 @@ K2 = eye(2) * 10;
 D = eye(2) * 10; 
 
 %% Time parameters
-T = 10;      % Final time instant
+T = 1;      % Final time instant
 Ts = 1e-2;   % Integration step    
 
 %% Data generation parameters
@@ -49,8 +49,9 @@ reductionStep = 20;
 
 %% MPC parameters
 
-controlHorizon = 100;
-mpcMaxIterations = 400;
+controlHorizon = 20;
+lastSteps = 5;
+maxIterations = 400;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned
@@ -65,6 +66,8 @@ mpcParams.K1 = K1;
 mpcParams.K2 = K2;
 mpcParams.D = D;
 mpcParams.p = controlHorizon;
+mpcParams.maxIterations = maxIterations;
+mpcParams.lastSteps = lastSteps;
 
 %% Simulation configuration
 
