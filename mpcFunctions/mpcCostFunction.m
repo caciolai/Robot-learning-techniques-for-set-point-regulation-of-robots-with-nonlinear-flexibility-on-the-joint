@@ -17,7 +17,7 @@ function J = mpcCostFunction(x, u, e, data, params)
     J = 0.0;
     
     %% Terminal cost
-    k = 10;
+    k = params.lastSteps;
     
     % negli ultimi k step forza le theta verso la reference
     J = J + 100*(sum(sum(theta(end-k:end,:)-reference(end-k:end,:).^2,1),2));

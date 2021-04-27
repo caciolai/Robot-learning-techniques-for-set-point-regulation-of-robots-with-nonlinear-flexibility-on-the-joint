@@ -37,40 +37,32 @@ uHistory = zeros(T/Ts,nu);
 uHistory(1,:) = u0;
 
 %% Simulate closed-loop system
-% hbar = waitbar(0,'Simulation Progress');
-% for ct = 1:(T/Ts)
-%     tau_g = g(q_ref);
-%     fprintf("t = %.4f\n", (ct-1)*Ts);
-%     disp(xk');
+for ct = 1:(T/Ts)
+    tau_g = g(q_ref);
+    fprintf("t = %.4f\n", (ct-1)*Ts);
+    fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
     
-    % Compute optimal control moves.
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-%     mv = 0;
-%     tau = tau_g + mv;
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
+    tau = tau_g + mv;
     
-    % Implement first optimal control move and update plant states.
-%     xk = stateFunctionDT(xk, tau, params);
-%     xk = mpcStateFunctionDT(xk, tau, params);
+    xk = stateFunctionDT(xk, tau, mpcParams);
     
-    % Save plant states for display.
-%     xHistory(ct,:) = xk';
-%     uHistory(ct,:) = tau';
-%     waitbar(ct*Ts/T);
-% end
-% close(hbar);
+    xHistory(ct,:) = xk';
+    uHistory(ct,:) = mv';
+end
 
-tau_g = g(q_ref);
-tic
-[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-toc
-xHistory = info.Xopt;
-uHistory = info.MVopt;
+% tau_g = g(q_ref);
+% tic
+% [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
+% toc
+% xHistory = info.Xopt;
+% uHistory = info.MVopt;
 
 %% Plot closed-loop response
 figure
 
-% t = linspace(0, T, T/Ts);
-t = linspace(1, p+1, p+1);
+t = linspace(0, T, T/Ts);
+% t = linspace(0, p, p+1);
 
 subplot(2,2,1)
 hold on
@@ -92,8 +84,8 @@ title('Second link position')
 
 subplot(2,2,3)
 hold on
-plot(t,xHistory(:,3))
-plot(t,xHistory(:,4))
+plot(t,xHistory(:,5))
+plot(t,xHistory(:,6))
 xlabel('time')
 ylabel('$\dot{q}$', 'Interpreter', 'latex')
 legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
