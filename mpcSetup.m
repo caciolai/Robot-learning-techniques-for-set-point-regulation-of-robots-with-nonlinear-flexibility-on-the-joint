@@ -48,10 +48,12 @@ simParams.x_ref = x_ref;
 S = computeLQR(mpcParams, Q, R, N);
 
 % Load GP model trained offline
-load('gpMdl.mat');
+% load('gpMdl.mat');
+load('nnMdl.mat');
 
 mpcParams.S = S;
-mpcParams.gpMdl = gpMdl;
+% mpcParams.model = gpMdl;
+mpcParams.model = nnMdl;
 
 %% MPC model
 nlmpcObj.Model.StateFcn = ...

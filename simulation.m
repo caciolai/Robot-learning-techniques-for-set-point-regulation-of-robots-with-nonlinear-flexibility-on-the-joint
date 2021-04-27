@@ -37,32 +37,32 @@ uHistory = zeros(T/Ts,nu);
 uHistory(1,:) = u0;
 
 %% Simulate closed-loop system
-for ct = 1:(T/Ts)
-    tau_g = g(q_ref);
-    fprintf("t = %.4f\n", (ct-1)*Ts);
-    fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
-    
-    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-    tau = tau_g + mv;
-    
-    xk = stateFunctionDT(xk, tau, mpcParams);
-    
-    xHistory(ct,:) = xk';
-    uHistory(ct,:) = mv';
-end
+% for ct = 1:(T/Ts)
+%     tau_g = g(q_ref);
+%     fprintf("t = %.4f\n", (ct-1)*Ts);
+%     fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
+%     
+%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
+%     tau = tau_g + mv;
+%     
+%     xk = stateFunctionDT(xk, tau, mpcParams);
+%     
+%     xHistory(ct,:) = xk';
+%     uHistory(ct,:) = mv';
+% end
 
 % tau_g = g(q_ref);
-% tic
-% [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-% toc
-% xHistory = info.Xopt;
-% uHistory = info.MVopt;
+tic
+[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
+toc
+xHistory = info.Xopt;
+uHistory = info.MVopt;
 
 %% Plot closed-loop response
 figure
 
-t = linspace(0, T, T/Ts);
-% t = linspace(0, p, p+1);
+% t = linspace(0, T, T/Ts);
+t = linspace(0, p, p+1);
 
 subplot(2,2,1)
 hold on

@@ -40,16 +40,17 @@ Ts = 1e-2;   % Integration step
 
 %% Data generation parameters
 
-% time params for data generation
+% params for data generation
 dgT = 1;
 dgTs = 1e-3;
 
-nTrajectories = 500;
-reductionStep = 20;
+nTrajectories = 100;
+reductionStep = 1;
 
 %% MPC parameters
 
-controlHorizon = 20;
+% controlHorizon = 20;
+controlHorizon = 100;
 lastSteps = 5;
 maxIterations = 400;
 
@@ -88,3 +89,5 @@ simParams.T = T;
 simParams.Ts = Ts;
 simParams.x0 = x0;
 simParams.u0 = u0;
+
+clearvars all -except mpcParams simParams
