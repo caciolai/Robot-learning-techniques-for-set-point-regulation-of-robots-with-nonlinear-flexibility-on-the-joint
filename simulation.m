@@ -11,17 +11,17 @@ addpath(genpath('./mpcFunctions'));
 % robotModel;
 mpcSetup;
 
-x0 = simParams.x0;
-u0 = simParams.u0;
-T = simParams.T;
-Ts = simParams.Ts;
-x_ref = simParams.x_ref;
+x0 = params.x0;
+u0 = params.u0;
+T = params.T;
+Ts = params.Ts;
+x_ref = params.x_ref;
 
 nx = nlmpcObj.Dimensions.NumberOfStates;
 nu = nlmpcObj.Dimensions.NumberOfInputs;
 ny = nlmpcObj.Dimensions.NumberOfOutputs;
 
-p = mpcParams.p;
+p = params.p;
 
 %% Initialize simulation
 mv = u0;
@@ -45,7 +45,7 @@ uHistory(1,:) = u0;
 %     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
 %     tau = tau_g + mv;
 %     
-%     xk = stateFunctionDT(xk, tau, mpcParams);
+%     xk = stateFunctionDT(xk, tau, params);
 %     
 %     xHistory(ct,:) = xk';
 %     uHistory(ct,:) = mv';

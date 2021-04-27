@@ -7,10 +7,12 @@ addpath(genpath('./modelFunctions'));
 parameters;
 plotting = false;
 
-B = mpcParams.B;
-K1 = mpcParams.K1;
-K2 = mpcParams.K2;
-D = mpcParams.D;
+dgT = params.dgT;
+dgTs = params.dgTs;
+B = params.B;
+K1 = params.K1;
+K2 = params.K2;
+D = params.D;
 
 %% DATA GENERATION for multiple trajectories
 
@@ -18,25 +20,25 @@ D = mpcParams.D;
 q_in = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 q_fin = 2*pi*(rand(2, nTrajectories)) - pi*ones(2, nTrajectories);
 
-if plotting
-    figure(1)
-    % To check if the configuration space is covered
-    hold on
-    for i=1:nTrajectories
-        plot(q_in(1,i), q_in(2,i), 'o')
-    end
-    xlim([-pi, pi]);
-    ylim([-pi, pi]);
-
-    figure(2)
-    % To check if the configuration space is covered
-    hold on
-    for i=1:nTrajectories
-        plot(q_fin(1,i), q_fin(2,i), '+')
-    end
-    xlim([-pi, pi]);
-    ylim([-pi, pi]);
-end
+% if plotting
+%     figure(1)
+%     % To check if the configuration space is covered
+%     hold on
+%     for i=1:nTrajectories
+%         plot(q_in(1,i), q_in(2,i), 'o')
+%     end
+%     xlim([-pi, pi]);
+%     ylim([-pi, pi]);
+% 
+%     figure(2)
+%     % To check if the configuration space is covered
+%     hold on
+%     for i=1:nTrajectories
+%         plot(q_fin(1,i), q_fin(2,i), '+')
+%     end
+%     xlim([-pi, pi]);
+%     ylim([-pi, pi]);
+% end
     
 % Reduction step to undersample trajectories
 nSamplesFull = dgT*(1/dgTs);
@@ -65,11 +67,13 @@ for i=1:nTrajectories
     
     [qd, qd_dot,qd_ddot] = get_Trajectory_Desired(q0, q0_dot, q0_ddot, qf, qf_dot, qf_ddot,dgT,dgTs,nLinks);
     
-    data = data_gen_single_trajectory(q0, q0_dot,  qd, qd_dot, qd_ddot, dgT, dgTs, B, K1, K2, D);
+    data = data_gen_single_trajectory(q0, q0_dot, ...
+        qd, qd_dot, qd_ddot, params);
     
     x = data(1:4,:); % [q, theta]
     y = data(5:6,:); % elastic terms
     y_real = data(7:8,:);
+    q = x(1:2,:);
     
     trajStartStep = (i-1)*nSamplesFull+1;
     trajEndStep = i*nSamplesFull;
@@ -88,27 +92,49 @@ for i=1:nTrajectories
     % Plotting
     if plotting
         figure(i)
-        subplot(1,2,1);
+        subplot(2,2,1);
         hold on
         grid on
         plot(y(1, :));
         plot(y_real(1, :));
         set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-        
         xlabel('time');
         ylabel('$\psi_1$', 'Interpreter', 'latex');
         legend('$y$', '$y_{real}$', 'Interpreter', 'latex');
+        title("Elasticity (first joint)");
         
-        subplot(1,2,2);
+        subplot(2,2,2);
         hold on
         grid on
         plot(y(2, :));
         plot(y_real(2, :));
         set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-        
         xlabel('time');
         ylabel('$\psi_1$', 'Interpreter', 'latex');
         legend('$y$', '$y_{real}$', 'Interpreter', 'latex');
+        title("Elasticity (second joint)");
+        
+        subplot(2,2,3);
+        hold on
+        grid on
+        plot(q(1, :));
+        plot(qd(1, :));
+        set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+        xlabel('time');
+        ylabel('$q_1$', 'Interpreter', 'latex');
+        legend('$q_1$', '$q^d_1$', 'Interpreter', 'latex');
+        title("Trajectory (first joint)");
+        
+        subplot(2,2,4);
+        hold on
+        grid on
+        plot(q(2, :));
+        plot(qd(2, :));
+        set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+        xlabel('time');
+        ylabel('$q_2$', 'Interpreter', 'latex');
+        legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex');
+        title("Trajectory (second joint)");
     end
 end
 close(bar);

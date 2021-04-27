@@ -61,14 +61,17 @@ Q(5:8, 5:8) = zeros(4,4);
 R = eye(2);           % to be tuned 
 N = zeros(8,2);
 
-mpcParams.Ts = Ts;
-mpcParams.B = B;
-mpcParams.K1 = K1;
-mpcParams.K2 = K2;
-mpcParams.D = D;
-mpcParams.p = controlHorizon;
-mpcParams.maxIterations = maxIterations;
-mpcParams.lastSteps = lastSteps;
+params.T = T;
+params.dgT = dgT;
+params.Ts = Ts;
+params.dgTs = dgTs;
+params.B = B;
+params.K1 = K1;
+params.K2 = K2;
+params.D = D;
+params.p = controlHorizon;
+params.maxIterations = maxIterations;
+params.lastSteps = lastSteps;
 
 %% Simulation configuration
 
@@ -85,9 +88,7 @@ u0 = [0; 0];
 % desired link position
 q_ref = [pi/4 pi/4]';
 
-simParams.T = T;
-simParams.Ts = Ts;
-simParams.x0 = x0;
-simParams.u0 = u0;
+params.x0 = x0;
+params.u0 = u0;
 
-clearvars all -except mpcParams simParams
+clearvars all -except params

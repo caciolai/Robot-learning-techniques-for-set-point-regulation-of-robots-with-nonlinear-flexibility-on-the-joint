@@ -33,13 +33,13 @@ function x_dot = mpcStateFunctionCT(x, u, params)
     psi = model([q;theta]);
     
     %% Check error   
-    psi_real = nonlinearElasticity(x, K1, K2);
-    error = sqrt((psi_real - psi)'*(psi_real - psi));
-    
-    if error > 1
-        disp(error)
-        disp('Bad model :(')
-    end  
+%     psi_real = nonlinearElasticity(x, K1, K2);
+%     error = sqrt((psi_real - psi)'*(psi_real - psi));
+%     
+%     if error > 1
+%         fprintf("error: %.4f\n", error);
+%         fprintf("Bad model :(\n");
+%     end  
     
     %% Dynamics
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot);

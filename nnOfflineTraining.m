@@ -1,8 +1,9 @@
 
 %% Offline training with NN
 %https://it.mathworks.com/help/deeplearning/ug/workflow-for-neural-network-design.html
-clear all
-close all
+clear all;
+close all;
+clc;
 
 %% Load data
 load('data.mat');
@@ -13,10 +14,11 @@ dataset = [X;T];
 %% Create network
 setdemorandstream(491218382);
 net = fitnet(32);
+net = configure(net,X,T);
 view(net)
 
 %% TRAIN THE NETWORK
-[net,tr] = train(net,X,T);
+[net,tr] = train(net,X,T,'useGPU','yes');
 nntraintool
 nntraintool('close')
 plotperform(tr)
@@ -26,7 +28,6 @@ testX = X(:,tr.testInd);
 testT = T(:,tr.testInd);
 
 testY = net(testX);
-
 perf = mse(net,testT,testY)
 
 figure

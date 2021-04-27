@@ -33,7 +33,7 @@ x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 
 %% MPC parameters
 % nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
-nlmpcObj.Optimization.SolverOptions.MaxIterations = mpcParams.maxIterations;
+nlmpcObj.Optimization.SolverOptions.MaxIterations = params.maxIterations;
 
 nlmpcObj.Model.IsContinuousTime = false;
 nlmpcObj.Ts = Ts;
@@ -41,29 +41,28 @@ nlmpcObj.PredictionHorizon = controlHorizon;
 nlmpcObj.ControlHorizon = controlHorizon;  
 nlmpcObj.Model.NumberOfParameters = 0;
 
-mpcParams.x_ref = x_ref; 
-simParams.x_ref = x_ref;
+params.x_ref = x_ref; 
 
 % System linearization and LQR
-S = computeLQR(mpcParams, Q, R, N);
+S = computeLQR(params, Q, R, N);
 
 % Load GP model trained offline
 % load('gpMdl.mat');
 load('nnMdl.mat');
 
-mpcParams.S = S;
-% mpcParams.model = gpMdl;
-mpcParams.model = nnMdl;
+params.S = S;
+% params.model = gpMdl;
+params.model = nnMdl;
 
 %% MPC model
 nlmpcObj.Model.StateFcn = ...
-    @(x, u) mpcStateFunctionDT(x, u, mpcParams); 
+    @(x, u) mpcStateFunctionDT(x, u, params); 
 nlmpcObj.Model.OutputFcn = ...
-    @(x, u) mpcOutputFunction(x, u, mpcParams);
+    @(x, u) mpcOutputFunction(x, u, params);
 
 %% MPC cost
 nlmpcObj.Optimization.CustomCostFcn = ...
-    @(x,u,e,data) mpcCostFunction(x,u,e,data,mpcParams);
+    @(x,u,e,data) mpcCostFunction(x,u,e,data,params);
 
 nlmpcObj.Optimization.ReplaceStandardCost = true;
 
@@ -75,11 +74,11 @@ nlmpcObj.ManipulatedVariables(2).Max = +u_max;
 
 %% MPC constraints
 nlmpcObj.Optimization.CustomIneqConFcn = ...
-    @(x,u,e,data) mpcInequalityConstraints(x,u,e,data,mpcParams);
+    @(x,u,e,data) mpcInequalityConstraints(x,u,e,data,params);
 
 
 %% Validate model
 validateFcns(nlmpcObj,x0,u0);
 
 %% Cleanup
-clearvars -except nlmpcObj x0 u0 mpcParams simParams
+clearvars -except nlmpcObj x0 u0 params simParams
