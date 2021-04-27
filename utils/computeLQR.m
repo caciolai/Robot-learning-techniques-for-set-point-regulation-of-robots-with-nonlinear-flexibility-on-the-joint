@@ -6,9 +6,12 @@ function S = computeLQR(params, Q, R, N)
     q = [x1; x2];               % x5 = q1_dot
     theta = [x3; x4];           % x6 = q2_dot
     q_dot = [x5; x6];           % x7 = theta1_dot
-    theta_dot = [x7; x8];       % x8 = theta2_dot            
+    theta_dot = [x7; x8];       % x8 = theta2_dot      
+    
+    syms u [2 1] 'real'
 
     x_ref = params.x_ref;
+    q_ref = x_ref(1:2)';
     B = params.B;
     K1 = params.K1;
     K2 = params.K2;
@@ -17,15 +20,20 @@ function S = computeLQR(params, Q, R, N)
     %     psi = linearElasticity(x, K1);
     psi = nonlinearElasticity(x, K1, K2);
 
-    % Vector fields
-    fx = [q_dot; theta_dot; M(q)\(-psi - c(q, q_dot) - g(q) -D*(q_dot-theta_dot)); B\(psi-D*(theta_dot-q_dot))];
-    gx = [zeros(6,2); inv(B)];
+    % Nonlinear dynamics
+    f = [  % x_dot = [q_dot, theta_dot, q_ddot, theta_ddot]
+        q_dot; 
+        theta_dot; 
+        M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot); 
+        B\(u + psi - D*theta_dot)
+    ];
 
     x_bar = x_ref';  % Equilibrium point
-    % u_bar = 0
+    tau_g = g(q_ref);
+    u_bar = tau_g;
 
-    A_sys = double(subs(jacobian(fx,x), x, x_bar));
-    B_sys = double(subs(gx, x, x_bar));
+    A_sys = double(subs(jacobian(f,x), [x; u], [x_bar; u_bar]));
+    B_sys = double(subs(jacobian(f,u), [x; u], [x_bar; u_bar]));
 
     % lqr for terminal cost
     [~,S,~] = lqr(A_sys,B_sys,Q,R,N);

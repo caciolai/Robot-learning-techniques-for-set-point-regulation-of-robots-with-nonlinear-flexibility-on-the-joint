@@ -40,7 +40,7 @@ uHistory(1,:) = u0;
 for ct = 1:(T/Ts)
     tau_g = g(q_ref);
     fprintf("t = %.4f\n", (ct-1)*Ts);
-    disp(xk(1:4)');
+    fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
     
     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
     tau = tau_g + mv;
@@ -84,8 +84,8 @@ title('Second link position')
 
 subplot(2,2,3)
 hold on
-plot(t,xHistory(:,3))
-plot(t,xHistory(:,4))
+plot(t,xHistory(:,5))
+plot(t,xHistory(:,6))
 xlabel('time')
 ylabel('$\dot{q}$', 'Interpreter', 'latex')
 legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
