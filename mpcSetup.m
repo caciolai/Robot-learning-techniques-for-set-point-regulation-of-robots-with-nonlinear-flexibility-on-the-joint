@@ -36,9 +36,9 @@ x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 nlmpcObj.Optimization.SolverOptions.MaxIterations = params.maxIterations;
 
 nlmpcObj.Model.IsContinuousTime = false;
-nlmpcObj.Ts = Ts;
-nlmpcObj.PredictionHorizon = controlHorizon;       
-nlmpcObj.ControlHorizon = controlHorizon;  
+nlmpcObj.Ts = params.Ts;
+nlmpcObj.PredictionHorizon = params.p;       
+nlmpcObj.ControlHorizon = params.p;  
 nlmpcObj.Model.NumberOfParameters = 0;
 
 params.x_ref = x_ref; 
@@ -47,12 +47,12 @@ params.x_ref = x_ref;
 S = computeLQR(params, Q, R, N);
 
 % Load GP model trained offline
-% load('gpMdl.mat');
-load('nnMdl.mat');
+load('gpMdl.mat');
+% load('nnMdl.mat');
 
 params.S = S;
-% params.model = gpMdl;
-params.model = nnMdl;
+params.model = gpMdl;
+% params.model = nnMdl;
 
 %% MPC model
 nlmpcObj.Model.StateFcn = ...
