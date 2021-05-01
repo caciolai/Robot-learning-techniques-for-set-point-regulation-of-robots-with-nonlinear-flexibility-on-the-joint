@@ -20,7 +20,7 @@ function J = mpcCostFunction(x, u, e, data, params)
     k = params.lastSteps;
     
     % negli ultimi k step forza le theta verso la reference
-    J = J + 100*(sum(sum(theta(end-k:end,:)-reference(end-k:end,:).^2,1),2));
+    J = J + 100*(sum(sum((theta(end-k:end,:)-reference(end-k:end,:)).^2, 1), 2));
     
     % negli ultimi k step forza le theta dot a zero (induci stabilità
     % dell'equilibrio)
