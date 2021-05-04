@@ -49,8 +49,8 @@ reductionStep = 1;
 
 %% MPC parameters
 
-% controlHorizon = 20;
-controlHorizon = 100;
+controlHorizon = 20;
+% controlHorizon = 100;
 lastSteps = 5;
 maxIterations = 400;
 

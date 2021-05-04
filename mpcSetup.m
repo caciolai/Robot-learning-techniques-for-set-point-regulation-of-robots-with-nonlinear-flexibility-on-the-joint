@@ -48,7 +48,7 @@ S = computeLQR(params, Q, R, N);
 
 % Load GP model trained offline
 load('gpMdl.mat');
-% load('nnMdl.mat');
+load('nnMdl.mat');
 
 params.S = S;
 params.model = gpMdl;
@@ -81,4 +81,4 @@ nlmpcObj.Optimization.CustomIneqConFcn = ...
 validateFcns(nlmpcObj,x0,u0);
 
 %% Cleanup
-clearvars -except nlmpcObj x0 u0 params simParams
+clearvars -except nlmpcObj x0 u0 params nnMdl

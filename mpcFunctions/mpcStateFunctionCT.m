@@ -37,10 +37,11 @@ function x_dot = mpcStateFunctionCT(x, u, params)
 %     error = sqrt((psi_real - psi)'*(psi_real - psi));
 %     
 %     if error > 1
-%         fprintf("error: %.4f\n", error);
 %         fprintf("Bad model :(\n");
+%         fprintf("err = %.4f\n", error);
+%         fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
 %     end  
-    
+
     %% Dynamics
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot);
     theta_ddot = B\(psi + u + u_nominal -D*theta_dot);
