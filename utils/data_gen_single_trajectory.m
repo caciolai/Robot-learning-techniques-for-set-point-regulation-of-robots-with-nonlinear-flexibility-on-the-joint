@@ -50,8 +50,8 @@ function [data] = data_gen_single_trajectory(q0, q0_dot,...
         psi(:,k)=B*theta_ddot(:,k+1)+D*theta_dot(:,k)-u(:,k);
     end
     
-    input=[q; theta]; % 4xN ; N=number of sampled points
-    output=[psi];     % 2xN
+    input=[theta - q]; % 2xN ; N=number of sampled points
+    output=[psi];      % 2xN
     
     data=[input;output;psi_real];  % 6xN
     

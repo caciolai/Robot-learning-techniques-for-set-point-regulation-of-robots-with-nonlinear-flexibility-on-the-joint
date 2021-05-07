@@ -44,8 +44,8 @@ Ts = 1e-2;   % Integration step
 dgT = 1;
 dgTs = 1e-3;
 
-nTrajectories = 100;
-reductionStep = 1;
+nTrajectories = 1;
+reductionStep = 10;
 
 %% MPC parameters
 
@@ -61,6 +61,8 @@ Q(5:8, 5:8) = zeros(4,4);
 R = eye(2);           % to be tuned 
 N = zeros(8,2);
 
+data_mpc = zeros(4,1); % [theta - q ; psi]
+
 params.T = T;
 params.dgT = dgT;
 params.Ts = Ts;
@@ -72,6 +74,7 @@ params.D = D;
 params.p = controlHorizon;
 params.maxIterations = maxIterations;
 params.lastSteps = lastSteps;
+params.data_mpc = data_mpc;
 
 %% Simulation configuration
 
@@ -86,7 +89,10 @@ x0 = [q0; theta0; q0_dot; theta0_dot];
 u0 = [0; 0];
 
 % desired link position
-q_ref = [pi/4 pi/4]';
+% q_ref = [pi/4 pi/4]';
+q_ref = [0; 0];
+q_ref(1) = input('Desired link 1 position : ');
+q_ref(2) = input('Desired link 2 position : ')
 
 params.x0 = x0;
 params.u0 = u0;
