@@ -3,9 +3,13 @@ clear all;
 close all;
 clc;
 
-addpath(genpath('./utils'));
+addpath(genpath('../'));
+addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
+addpath(genpath('./modelsTraining'));
 addpath(genpath('./mpcFunctions'));
+addpath(genpath('./savedData'));
+addpath(genpath('./utils'));
 
 %% Load parameters, model and setup mpc
 % robotModel;
@@ -63,36 +67,36 @@ psiNN = zeros(nSamples,2);
 %     xk = info.Xopt(end,:)';
 % end
 
-% tic
-% [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
-% toc
-% xHistory = info.Xopt;
-% uHistory = info.MVopt;
+tic
+[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
+toc
+xHistory = info.Xopt;
+uHistory = info.MVopt;
 
-%% Simulate closed-loop system
-for ct = 1:nSamples
-    tau_g = g(q_ref);
-    fprintf("t = %.4f\n", (ct-1)*Ts);
-    fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
-    
-    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-    tau = tau_g + mv;
-        
-    psiHistory(ct,:) = nonlinearElasticity(xk, params.K1, params.K2);
-    psiGP(ct,:) = gpPredict(xk, params.model);
-    psiNN(ct,:) = nnMdl(xk(1:4));
-    
-    xk = stateFunctionDT(xk, tau, params);
-
-    xHistory(ct,:) = xk';
-    uHistory(ct,:) = mv';
-end
+% %% Simulate closed-loop system
+% for ct = 1:nSamples
+%     tau_g = g(q_ref);
+%     fprintf("t = %.4f\n", (ct-1)*Ts);
+%     fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
+%     
+%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
+%     tau = tau_g + mv;
+%         
+%     psiHistory(ct,:) = nonlinearElasticity(xk, params.K1, params.K2);
+%     psiGP(ct,:) = gpPredict(xk, params.model);
+%     psiNN(ct,:) = nnMdl(xk(1:4));
+%     
+%     xk = stateFunctionDT(xk, tau, params);
+% 
+%     xHistory(ct,:) = xk';
+%     uHistory(ct,:) = mv';
+% end
 
 %% Plot closed-loop response
 figure
 
-t = linspace(0, T, nSamples);
-% t = linspace(0, p, p+1);
+% t = linspace(0, T, nSamples);
+t = linspace(0, p, p+1);
 
 subplot(2,2,1)
 hold on

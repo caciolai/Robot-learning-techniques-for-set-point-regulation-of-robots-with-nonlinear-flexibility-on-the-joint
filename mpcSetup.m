@@ -1,6 +1,11 @@
 %% MPC SETUP
+addpath(genpath('../'));
+addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
+addpath(genpath('./modelsTraining'));
 addpath(genpath('./mpcFunctions'));
+addpath(genpath('./savedData'));
+addpath(genpath('./utils'));
 parameters;
 
 %% Create nonlinear MPC object
@@ -48,7 +53,7 @@ S = computeLQR(params, Q, R, N);
 
 % Load GP model trained offline
 load('gpMdl.mat');
-load('nnMdl.mat');
+% load('nnMdl.mat');
 
 params.S = S;
 params.model = gpMdl;

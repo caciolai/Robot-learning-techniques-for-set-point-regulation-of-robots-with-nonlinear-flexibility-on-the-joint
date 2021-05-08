@@ -45,12 +45,12 @@ dgT = 1;
 dgTs = 1e-3;
 
 nTrajectories = 100;
-reductionStep = 1;
+reductionStep = 10;
 
 %% MPC parameters
 
-controlHorizon = 20;
-% controlHorizon = 100;
+% controlHorizon = 20;
+controlHorizon = 100;
 lastSteps = 5;
 maxIterations = 400;
 
@@ -86,7 +86,10 @@ x0 = [q0; theta0; q0_dot; theta0_dot];
 u0 = [0; 0];
 
 % desired link position
-q_ref = [pi/4 pi/4]';
+% q_ref = [pi/4 pi/4]';
+q_ref = [0; 0];
+q_ref(1) = input('Desired link 1 position : ');
+q_ref(2) = input('Desired link 2 position : ')
 
 params.x0 = x0;
 params.u0 = u0;

@@ -21,26 +21,25 @@ function x_dot = mpcStateFunctionCT(x, u, params)
 
     % Compute elastic term
 %     psi = linearElasticity(x, K1);
-    psi = nonlinearElasticity(x, K1, K2);
+%     psi = nonlinearElasticity(x, K1, K2);
     
     %% Using gp prediction
-%     [psi_pred_1,~,~] = predict(gpMdl{1}, [q;theta]');
-%     [psi_pred_2,~,~] = predict(gpMdl{2}, [q;theta]');
-%     psi = [psi_pred_1;psi_pred_2];
-%      
+    psi_pred_1 = predict(model{1}, [theta - q]');
+    psi_pred_2 = predict(model{2}, [theta - q]');
+    psi = [psi_pred_1;psi_pred_2];    
     
     %% Using NN prediction
 %     psi = model([q;theta]);
     
     %% Check error   
-%     psi_real = nonlinearElasticity(x, K1, K2);
-%     error = sqrt((psi_real - psi)'*(psi_real - psi));
-%     
-%     if error > 1
-%         fprintf("Bad model :(\n");
-%         fprintf("err = %.4f\n", error);
-%         fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
-%     end  
+    psi_real = nonlinearElasticity(x, K1, K2);
+    error = sqrt((psi_real - psi)'*(psi_real - psi));
+    
+    if error > 1
+        fprintf("Bad model :(\n");
+        fprintf("err = %.4f\n", error);
+        fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", x(1),x(2),x(3),x(4));
+    end  
 
     %% Dynamics
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot);
