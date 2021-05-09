@@ -1,5 +1,5 @@
 %% MPC SETUP
-addpath(genpath('../'));
+
 addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
 addpath(genpath('./modelsTraining'));

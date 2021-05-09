@@ -3,7 +3,6 @@ clear all;
 close all;
 clc;
 
-addpath(genpath('../'));
 addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
 addpath(genpath('./modelsTraining'));
