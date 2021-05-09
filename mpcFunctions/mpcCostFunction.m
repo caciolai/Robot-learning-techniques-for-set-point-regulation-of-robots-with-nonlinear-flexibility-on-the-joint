@@ -2,7 +2,7 @@ function J = mpcCostFunction(x, u, e, data, params)
     
     % Unpack parameters
     x_ref = params.x_ref;
-    p = params.p;
+    p = params.controlHorizon;
     S = params.S;
 
     u = u(1:p,:);

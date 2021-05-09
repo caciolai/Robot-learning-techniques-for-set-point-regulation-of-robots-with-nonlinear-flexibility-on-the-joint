@@ -69,8 +69,8 @@ disp("Done.");
 toc
 
 %% Evaluate the predictions
-[test_pred_1,~,~] = predict(gpMdl_1, test_data);
-[test_pred_2,~,~] = predict(gpMdl_2, test_data);
+test_pred_1 = predict(gpMdl_1, test_data);
+test_pred_2 = predict(gpMdl_2, test_data);
 
 figure
 title("Elastic term (first joint)");
@@ -92,7 +92,7 @@ set(findall(gcf,'type','line'),'linewidth',1);
 
 figure
 subplot(2,1,1)
-title("Elastic term error(first joint)");
+title("Elastic term error (first joint)");
 hold on
 grid on
 plot(test_target_1 - test_pred_1);
@@ -100,7 +100,7 @@ legend('Error link 1');
 set(findall(gcf,'type','line'),'linewidth',1); 
 
 subplot(2,1,2)
-title("Elastic term error(second joint)");
+title("Elastic term error (second joint)");
 hold on
 grid on
 plot(test_target_2 - test_pred_2);
@@ -109,6 +109,6 @@ set(findall(gcf,'type','line'),'linewidth',1);
 
 %% Save model
 
-gpMdl = {compact(gpMdl_1);compact(gpMdl_2)};
-save('..\savedData\gpMdl.mat', 'gpMdl');
+gpMdl = {gpMdl_1; gpMdl_2};
+save('../savedData/gpMdl.mat', 'gpMdl');
 disp("Model saved.");

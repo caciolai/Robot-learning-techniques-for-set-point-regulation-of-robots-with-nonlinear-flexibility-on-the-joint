@@ -37,13 +37,11 @@ theta_ref = sol.x;
 x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 
 %% MPC parameters
-% nlmpcObj.Optimization.SolverOptions.Algorithm ='interior-point'; 
-nlmpcObj.Optimization.SolverOptions.MaxIterations = params.maxIterations;
 
 nlmpcObj.Model.IsContinuousTime = false;
 nlmpcObj.Ts = params.Ts;
-nlmpcObj.PredictionHorizon = params.p;       
-nlmpcObj.ControlHorizon = params.p;  
+nlmpcObj.PredictionHorizon = params.controlHorizon;  
+nlmpcObj.ControlHorizon = params.controlHorizon;       
 nlmpcObj.Model.NumberOfParameters = 0;
 
 params.x_ref = x_ref; 
@@ -71,7 +69,7 @@ nlmpcObj.Optimization.CustomCostFcn = ...
 
 nlmpcObj.Optimization.ReplaceStandardCost = true;
 
-u_max = 1000;
+u_max = params.maxTorque;
 nlmpcObj.ManipulatedVariables(1).Min = -u_max;
 nlmpcObj.ManipulatedVariables(1).Max = +u_max;
 nlmpcObj.ManipulatedVariables(2).Min = -u_max;

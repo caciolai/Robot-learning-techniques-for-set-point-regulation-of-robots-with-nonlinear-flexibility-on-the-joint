@@ -52,7 +52,7 @@ reductionStep = 10;
 % controlHorizon = 20;
 controlHorizon = 100;
 lastSteps = 5;
-maxIterations = 400;
+maxTorque = 100;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned
@@ -69,9 +69,9 @@ params.B = B;
 params.K1 = K1;
 params.K2 = K2;
 params.D = D;
-params.p = controlHorizon;
-params.maxIterations = maxIterations;
+params.controlHorizon = controlHorizon;
 params.lastSteps = lastSteps;
+params.maxTorque = maxTorque;
 
 %% Simulation configuration
 
