@@ -3,6 +3,7 @@ clear all;
 close all;
 clc;
 
+addpath(genpath('../'));
 addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
 addpath(genpath('./modelsTraining'));
@@ -24,7 +25,7 @@ nx = nlmpcObj.Dimensions.NumberOfStates;
 nu = nlmpcObj.Dimensions.NumberOfInputs;
 ny = nlmpcObj.Dimensions.NumberOfOutputs;
 
-p = params.controlHorizon;
+p = params.p;
 
 %% Initialize simulation
 mv = u0;
@@ -101,7 +102,7 @@ subplot(2,2,1)
 hold on
 grid on
 plot(t,xHistory(:,1))
-yline(q_ref(1), 'r-');
+yline(q_ref(1), '-');
 xlabel('time')
 ylabel('$q_1$', 'Interpreter', 'latex')
 legend('$q_1$', '$q_1^d$', 'Interpreter', 'latex');
@@ -111,21 +112,21 @@ subplot(2,2,2)
 hold on
 grid on
 plot(t,xHistory(:,2))
-yline(q_ref(2), 'o-');
+yline(q_ref(2), '-');
 xlabel('time')
 ylabel('$q_2$', 'Interpreter', 'latex')
 legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex');
 title('Second link position')
 
-subplot(2,2,3)
-hold on
-grid on
-plot(t,xHistory(:,5))
-plot(t,xHistory(:,6))
-xlabel('time')
-ylabel('$\dot{q}$', 'Interpreter', 'latex')
-legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
-title('Link velocities')
+% subplot(2,2,3)
+% hold on
+% grid on
+% plot(t,xHistory(:,5))
+% plot(t,xHistory(:,6))
+% xlabel('time')
+% ylabel('$\dot{q}$', 'Interpreter', 'latex')
+% legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
+% title('Link velocities')
 % plot(t,psiHistory(:,1)-psiGP(:,1))
 % plot(t,psiHistory(:,2)-psiGP(:,2))
 % xlabel('time')
@@ -133,15 +134,15 @@ title('Link velocities')
 % legend('$\psi^{err}_1$','$\psi^{err}_2$','Interpreter', 'latex');
 % title('Elasticity prediction error (GP)')
 
-subplot(2,2,4)
-hold on
-grid on
-plot(t,uHistory(:,1))
-plot(t,uHistory(:,2))
-xlabel('time')
-ylabel('$\tau$', 'Interpreter', 'latex')
-legend('$\tau_1$', '$\tau_2$', 'Interpreter', 'latex');
-title('Controlled torque')
+% subplot(2,2,4)
+% hold on
+% grid on
+% plot(t,uHistory(:,1))
+% plot(t,uHistory(:,2))
+% xlabel('time')
+% ylabel('$\tau$', 'Interpreter', 'latex')
+% legend('$\tau_1$', '$\tau_2$', 'Interpreter', 'latex');
+% title('Controlled torque')
 % plot(t,psiHistory(:,1)-psiNN(:,1))
 % plot(t,psiHistory(:,2)-psiNN(:,2))
 % ylabel('$\psi^{real} - \psi^{pred}$','Interpreter', 'latex')
