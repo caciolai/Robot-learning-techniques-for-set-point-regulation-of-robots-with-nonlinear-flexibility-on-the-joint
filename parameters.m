@@ -28,15 +28,15 @@ end
 B = eye(2);
 
 % Stiffness matrices (for elasticity)
-K1 = eye(2) * 1000;
-K2 = eye(2) * 10;
+K1 = eye(2) * 1e3;
+K2 = eye(2) * 1e2;
 
 % Damping
 D = eye(2) * 10; 
 
 %% Time parameters
 T = 1;      % Final time instant
-Ts = 1e-2;   % Integration step    
+Ts = 1e-3;   % Integration step    
 
 %% Data generation parameters
 
@@ -49,10 +49,10 @@ reductionStep = 10;
 
 %% MPC parameters
 
-% controlHorizon = 20;
-controlHorizon = 100;
+controlHorizon = 30;
+% controlHorizon = 100;
 lastSteps = 5;
-maxTorque = 100;
+maxTorque = 1;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned
@@ -86,10 +86,9 @@ x0 = [q0; theta0; q0_dot; theta0_dot];
 u0 = [0; 0];
 
 % desired link position
-% q_ref = [pi/4 pi/4]';
-q_ref = [0; 0];
-q_ref(1) = input('Desired link 1 position : ');
-q_ref(2) = input('Desired link 2 position : ')
+q_ref = [pi/4 pi/4]';
+% q_ref(1) = input('Desired link 1 position : ');
+% q_ref(2) = input('Desired link 2 position : ');
 
 params.x0 = x0;
 params.u0 = u0;
