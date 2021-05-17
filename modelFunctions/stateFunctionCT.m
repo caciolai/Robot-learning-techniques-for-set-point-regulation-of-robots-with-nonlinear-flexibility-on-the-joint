@@ -13,8 +13,9 @@ function x_dot = stateFunctionCT(x, u, params)
     theta_dot = x(7:8);
 
     % Compute elastic term
-%     psi = linearElasticity(x, K1);
-    psi = nonlinearElasticity(x, K1, K2);
+    phi = q-theta;
+%     psi = linearElasticity(phi, params);
+    psi = nonlinearElasticity(phi, params);
 
     q_ddot = M(q)\(-psi - c(q, q_dot) - g(q) -D*q_dot);
     theta_ddot = B\(psi + u -D*theta_dot);

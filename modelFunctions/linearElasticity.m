@@ -1,8 +1,7 @@
-function psi = linearElasticity(x, K)
+function psi = linearElasticity(phi, params)
     
-    q = x(1:2);
-    theta = x(3:4);
+    % phi = q - theta;
+    K = params.K1;
     
-    phi = q - theta;
     psi = K * phi;
 end

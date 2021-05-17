@@ -17,8 +17,9 @@ function S = computeLQR(params, Q, R, N)
     K2 = params.K2;
     D = params.D;
     
-    %     psi = linearElasticity(x, K1);
-    psi = nonlinearElasticity(x, K1, K2);
+    phi = q - theta;
+    %     psi = linearElasticity(phi, K1);
+    psi = nonlinearElasticity(phi, params);
 
     % Nonlinear dynamics
     f = [  % x_dot = [q_dot, theta_dot, q_ddot, theta_ddot]

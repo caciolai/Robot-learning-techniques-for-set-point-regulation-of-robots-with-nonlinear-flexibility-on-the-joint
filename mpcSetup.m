@@ -8,6 +8,11 @@ addpath(genpath('./savedData'));
 addpath(genpath('./utils'));
 parameters;
 
+
+q_ref = params.q_ref;
+K1 = params.K1;
+K2 = params.K2;
+
 %% Create nonlinear MPC object
 nx = 8; % number of state variables (q, theta, q_dot, theta_dot) 
 ny = 8; % number of output variables (full state)
@@ -16,6 +21,7 @@ nu = 2; % number of input variables (torques)
 nlmpcObj = nlmpc(nx,ny,nu);
 
 %% Plan trajectory
+
 
 % SET POINT FOR NONLINEAR ELASTICITY
 % vogliamo che all'equilibrio il termine elastico compensi la gravità
@@ -34,7 +40,7 @@ prob.Equations.eqn2 = eqn2;
 theta_ref = sol.x;
 
 % desired equilibrium (no velocity)
-x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
+params.x_ref = [q_ref; theta_ref; zeros(4, 1)]'; % must be row vector
 
 %% MPC parameters
 
@@ -44,18 +50,12 @@ nlmpcObj.PredictionHorizon = params.controlHorizon;
 nlmpcObj.ControlHorizon = params.controlHorizon;       
 nlmpcObj.Model.NumberOfParameters = 0;
 
-params.x_ref = x_ref; 
-
+ 
 % System linearization and LQR
-S = computeLQR(params, Q, R, N);
-
-% Load GP model trained offline
-load('gpMdl.mat');
-% load('nnMdl.mat');
-
-params.S = S;
-params.model = gpMdl;
-% params.model = nnMdl;
+Q = params.Q;
+R = params.R;
+N = params.N;
+params.S = computeLQR(params, Q, R, N);
 
 %% MPC model
 nlmpcObj.Model.StateFcn = ...
@@ -81,7 +81,12 @@ nlmpcObj.Optimization.CustomIneqConFcn = ...
 
 
 %% Validate model
+x0 = params.x0;
+u0 = params.u0;
 validateFcns(nlmpcObj,x0,u0);
 
+%% Initialize dataset
+initializeDataset;
+
 %% Cleanup
-clearvars -except nlmpcObj x0 u0 params nnMdl
+clearvars -except nlmpcObj params

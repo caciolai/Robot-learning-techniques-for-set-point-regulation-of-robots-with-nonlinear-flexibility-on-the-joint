@@ -1,8 +1,8 @@
-function psi = nonlinearElasticity(x, K1, K2)
+function psi = nonlinearElasticity(phi, params)
     
-    q = x(1:2);
-    theta = x(3:4);
-    phi = q - theta;
+    % phi = q - theta;
+    K1 = params.K1;
+    K2 = params.K2;
     
     linear = K1 * phi;
     cubic = K2 * (phi.^3);

@@ -7,15 +7,15 @@ clc;
 nLinks = 2; % 2R
 
 % towards negative y values so that it affects planar robot
-g0 = [0 -9.80665 0]'; 
+params.g0 = [0 -9.80665 0]'; 
 
 %% Rigid robot dynamic parameters and DH table
-m = ones([nLinks 1]); % masses
-l = ones([nLinks 1]); % link lengths
-d = 0.4*ones([nLinks 1]); % distance (>0) of the center of mass from O_RF_i
-I = zeros(3,3,nLinks); % the n inertia matrices
+params.m = ones([nLinks 1]); % masses
+params.l = ones([nLinks 1]); % link lengths
+params.d = 0.4*ones([nLinks 1]); % distance (>0) of the center of mass from O_RF_i
+params.I = zeros(3,3,nLinks); % the n inertia matrices
 for k=1:nLinks
-    I(:,:,k) = eye(3);
+    params.I(:,:,k) = eye(3);
 end
 
 
@@ -25,53 +25,46 @@ end
 % B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
 
 % Motor inertia matrix
-B = eye(2);
+params.B = eye(2);
 
 % Stiffness matrices (for elasticity)
-K1 = eye(2) * 1e3;
-K2 = eye(2) * 1e2;
+params.K1 = eye(2) * 1e3;
+params.K2 = eye(2) * 1e2;
 
 % Damping
-D = eye(2) * 10; 
+params.D = eye(2) * 10; 
 
 %% Time parameters
-T = 1;      % Final time instant
-Ts = 1e-3;   % Integration step    
+params.T = 1;      % Final time instant
+params.Ts = 1e-3;   % Integration step    
 
 %% Data generation parameters
 
 % params for data generation
-dgT = 1;
-dgTs = 1e-3;
+params.dgT = 1;
+params.dgTs = 1e-3;
 
 nTrajectories = 100;
 reductionStep = 10;
 
+params.datasetDimension = 100;
+params.datasetDimensionInit = 10;
+
 %% MPC parameters
 
-controlHorizon = 30;
-% controlHorizon = 100;
-lastSteps = 5;
-maxTorque = 1;
+params.controlHorizon = 30;
+% params.controlHorizon = 100;
+params.lastSteps = 5;
+params.maxTorque = 1;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned
 Q(1:4, 1:4) = diag([10,10, 1,1]);
 Q(5:8, 5:8) = zeros(4,4);
-R = eye(2);           % to be tuned 
-N = zeros(8,2);
+params.Q = Q;
+params.R = eye(2);           % to be tuned 
+params.N = zeros(8,2);
 
-params.T = T;
-params.dgT = dgT;
-params.Ts = Ts;
-params.dgTs = dgTs;
-params.B = B;
-params.K1 = K1;
-params.K2 = K2;
-params.D = D;
-params.controlHorizon = controlHorizon;
-params.lastSteps = lastSteps;
-params.maxTorque = maxTorque;
 
 %% Simulation configuration
 
@@ -82,15 +75,23 @@ q0_dot = [0; 0];
 theta0_dot = q0_dot;
 
 % initial configuration
-x0 = [q0; theta0; q0_dot; theta0_dot];
-u0 = [0; 0];
+params.x0 = [q0; theta0; q0_dot; theta0_dot];
+params.u0 = [0; 0];
 
 % desired link position
-q_ref = [pi/4 pi/4]';
-% q_ref(1) = input('Desired link 1 position : ');
-% q_ref(2) = input('Desired link 2 position : ');
+params.q_ref = [pi/4 pi/4]';
+% params.q_ref(1) = input('Desired link 1 position : ');
+% params.q_ref(2) = input('Desired link 2 position : ');
 
-params.x0 = x0;
-params.u0 = u0;
+%% Learning model
+
+% Load model trained offline
+load('gpMdl.mat');
+% load('nnMdl.mat');
+
+params.model = gpMdl;
+% params.model = nnMdl;
+
+%% Cleanup
 
 clearvars all -except params
