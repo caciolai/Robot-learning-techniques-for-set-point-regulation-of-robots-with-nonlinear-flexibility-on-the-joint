@@ -27,13 +27,14 @@ ny = nlmpcObj.Dimensions.NumberOfOutputs;
 
 p = params.controlHorizon;
 
+B = params.B;
+D = params.D;
 %% Initialize simulation
 mv = u0;
 xk = x0;
 
 q_ref = x_ref(1:2)';
 theta_ref = x_ref(3:4)';
-
 
 nSamples = T/Ts;
 % so that it is a multiple of p
@@ -50,31 +51,31 @@ uHistory = zeros(nSamples,nu);
 nloptions = nlmpcmoveopt;
 
 %% Simulate nominal system
-for ct = 1:(nSamples/p)
-    tau_g = g(q_ref);
-    fprintf("t = %.4f\n", ct * Ts * p);
-    state = xk(1:4)'
-    
-    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
-%     tau = tau_g + mv;
-    for k=1:p
-        t = (ct-1)*p + k;
-        xk = info.Xopt(k,:)';
-        uk = info.MVopt(k,:)';
-        
-%         psiHistory(t,:) = nonlinearElasticity(xk, params.K1, params.K2);
-%         psiGP(t,:) = gpPredict(xk, params.model);
-%         psiNN(t,:) = nnMdl(xk(1:4));
-%         xk = stateFunctionDT(xk, tau, params);
-
-        xHistory(t,:) = xk';
-        uHistory(t,:) = mv';
-    end
-    mv = info.MVopt(end,:)';
-    xk = info.Xopt(end,:)';
-end
-xHistory(end,:) = xk';
-uHistory(end,:) = mv';
+% for ct = 1:(nSamples/p)
+%     tau_g = g(q_ref);
+%     fprintf("t = %.4f\n", ct * Ts * p);
+%     state = xk(1:4)'
+%     
+%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
+% %     tau = tau_g + mv;
+%     for k=1:p
+%         t = (ct-1)*p + k;
+%         xk = info.Xopt(k,:)';
+%         uk = info.MVopt(k,:)';
+%         
+% %         psiHistory(t,:) = nonlinearElasticity(xk, params.K1, params.K2);
+% %         psiGP(t,:) = gpPredict(xk, params.model);
+% %         psiNN(t,:) = nnMdl(xk(1:4));
+% %         xk = stateFunctionDT(xk, tau, params);
+% 
+%         xHistory(t,:) = xk';
+%         uHistory(t,:) = mv';
+%     end
+%     mv = info.MVopt(end,:)';
+%     xk = info.Xopt(end,:)';
+% end
+% xHistory(end,:) = xk';
+% uHistory(end,:) = mv';
 
 % tic
 % [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
@@ -83,23 +84,31 @@ uHistory(end,:) = mv';
 % uHistory = info.MVopt;
 
 %% Simulate closed-loop system
-% for ct = 1:nSamples
-%     tau_g = g(q_ref);
-%     fprintf("t = %.4f\n", (ct-1)*Ts);
-%     fprintf("x = %.4f\t%.4f\t%.4f\t%.4f\n", xk(1),xk(2),xk(3),xk(4));
-%     
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref);
-%     tau = tau_g + mv;
-%         
-%     psiHistory(ct,:) = nonlinearElasticity(xk, params.K1, params.K2);
-%     psiGP(ct,:) = gpPredict(xk, params.model);
-%     psiNN(ct,:) = nnMdl(xk(1:4));
-%     
-%     xk = stateFunctionDT(xk, tau, params);
-% 
-%     xHistory(ct,:) = xk';
-%     uHistory(ct,:) = mv';
-% end
+dataset = params.dataset;
+for ct = 1:nSamples
+    tau_g = g(q_ref);
+    fprintf("t = %.4f\n", ct * Ts);
+    state = xk(1:4)'
+    
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
+    tau = tau_g + mv;
+    
+    [xk, xk_dot] = stateFunctionDT(xk, tau, params);
+    
+    % Reconstruct elasticity
+    if size(dataset,1) < params.datasetDimension
+        q = xk(1:2);
+        theta = xk(3:4);
+        theta_dot = xk_dot(3:4);
+        theta_ddot = xk_dot(7:8);
+        psi = B*theta_ddot + D*theta_dot - tau;
+        
+        dataset(end+1, :) = [q-theta; psi]';
+        params.model = gpTrain(dataset);
+    end
+    xHistory(ct,:) = xk';
+    uHistory(ct,:) = mv';
+end
 
 %% Plot closed-loop response
 figure
