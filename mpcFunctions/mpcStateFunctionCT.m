@@ -1,6 +1,6 @@
 function x_dot = mpcStateFunctionCT(x, u, params)
     
-    tic
+%     tic
     
     % Unpack params
     B = params.B;
@@ -37,6 +37,6 @@ function x_dot = mpcStateFunctionCT(x, u, params)
     
     x_dot = [q_dot; theta_dot; q_ddot; theta_ddot];
     
-    toc
+%     toc
 end
 

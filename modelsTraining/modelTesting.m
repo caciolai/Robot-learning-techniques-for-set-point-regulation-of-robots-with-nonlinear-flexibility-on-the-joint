@@ -49,6 +49,10 @@ for ct=1:nSamples
     psiPredicted(ct,:) = gpPredict(xk, gpMdl);
 end
 
+y = psiReal;
+y_hat = psiPredicted;
+RMSE = sqrt(mean((y - y_hat).^2))  % Root Mean Squared Error
+
 %% Show results
 % figure
 % title("Elastic term (first joint)");

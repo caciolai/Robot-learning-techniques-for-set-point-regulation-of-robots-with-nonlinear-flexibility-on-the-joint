@@ -13,36 +13,36 @@ addpath(genpath('./utils'));
 parameters;
 
 %% Load data
-disp("Loading data...");
 
-load('data_traj.mat');
-data_traj = [input; output];
-
-load('data_mpc.mat');
-data_mpc_full = [input; output];
-
-% Reducing data size
-reduction_data_size = 10;
-k = 1;
-for i = 1 : reduction_data_size : size(data_mpc_full,2)
-    data_mpc(:,k) = data_mpc_full(:,i);
-    k = k +1;
-end
-
-dataset = [data_traj, data_mpc];
+% load('data_traj.mat');
+% data_traj = [input; output];
+% 
+% load('data_mpc.mat');
+% data_mpc_full = [input; output];
+% 
+% % Reducing data size
+% reduction_data_size = 10;
+% k = 1;
+% for i = 1 : reduction_data_size : size(data_mpc_full,2)
+%     data_mpc(:,k) = data_mpc_full(:,i);
+%     k = k +1;
+% end
+% 
+% dataset = [data_traj, data_mpc];
 
 % load('dataset.mat')
 % input = dataset(1:2,:);
 % output = dataset(3:4,:);
 
-rng('default') % For reproducibility
-cols = size(dataset,2);
-disp("Done.");
+load('data_exc.mat');
+dataset = [input output]';
 
 %% Prepare dataset for training
-% Shuffle data columns 
-index = randperm(cols);
-dataset = dataset(:,index);
+
+% rng('default') % For reproducibility
+% cols = size(dataset,2);
+% index = randperm(cols);
+% dataset = dataset(:,index);
 
 train_data = input';
 train_target_1 = output(1,:)'; % Joint 1 data to train the model

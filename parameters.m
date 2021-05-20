@@ -44,8 +44,8 @@ params.Ts = 1e-3;   % Integration step
 params.dgT = 1;
 params.dgTs = 1e-3;
 
-nTrajectories = 100;
-reductionStep = 10;
+params.nTrajectories = 100;
+params.reductionStep = 10;
 
 params.datasetDimension = 100;
 params.datasetDimensionInit = 10;

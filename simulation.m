@@ -121,8 +121,8 @@ hold on
 grid on
 plot(t,xHistory(:,1))
 yline(q_ref(1), '-');
-xlabel('time')
-ylabel('$q_1$', 'Interpreter', 'latex')
+xlabel('[s]')
+ylabel('[rad]')
 legend('$q_1$', '$q_1^d$', 'Interpreter', 'latex');
 title('First link position')
 
@@ -131,8 +131,8 @@ hold on
 grid on
 plot(t,xHistory(:,2))
 yline(q_ref(2), '-');
-xlabel('time')
-ylabel('$q_2$', 'Interpreter', 'latex')
+xlabel('[s]')
+ylabel('[rad]')
 legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex');
 title('Second link position')
 
@@ -141,8 +141,8 @@ hold on
 grid on
 plot(t,xHistory(:,5))
 plot(t,xHistory(:,6))
-xlabel('time')
-ylabel('$\dot{q}$', 'Interpreter', 'latex')
+xlabel('[s]')
+ylabel('[rad/s]')
 legend('$\dot{q}_1$', '$\dot{q}_2$', 'Interpreter', 'latex');
 title('Link velocities')
 % plot(t,psiHistory(:,1)-psiGP(:,1))
@@ -157,8 +157,8 @@ hold on
 grid on
 plot(t,uHistory(:,1))
 plot(t,uHistory(:,2))
-xlabel('time')
-ylabel('$\tau$', 'Interpreter', 'latex')
+xlabel('[s]')
+ylabel('[N]')
 legend('$\tau_1$', '$\tau_2$', 'Interpreter', 'latex');
 title('Controlled torque')
 % plot(t,psiHistory(:,1)-psiNN(:,1))
