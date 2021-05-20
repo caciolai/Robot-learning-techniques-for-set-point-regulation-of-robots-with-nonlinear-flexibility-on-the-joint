@@ -86,7 +86,7 @@ u0 = params.u0;
 validateFcns(nlmpcObj,x0,u0);
 
 %% Initialize dataset
-initializeDataset;
+% initializeDataset;
 
 %% Cleanup
 clearvars -except nlmpcObj params

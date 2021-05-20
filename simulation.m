@@ -51,31 +51,31 @@ uHistory = zeros(nSamples,nu);
 nloptions = nlmpcmoveopt;
 
 %% Simulate nominal system
-% for ct = 1:(nSamples/p)
-%     tau_g = g(q_ref);
-%     fprintf("t = %.4f\n", ct * Ts * p);
-%     state = xk(1:4)'
-%     
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
-% %     tau = tau_g + mv;
-%     for k=1:p
-%         t = (ct-1)*p + k;
-%         xk = info.Xopt(k,:)';
-%         uk = info.MVopt(k,:)';
-%         
-% %         psiHistory(t,:) = nonlinearElasticity(xk, params.K1, params.K2);
-% %         psiGP(t,:) = gpPredict(xk, params.model);
-% %         psiNN(t,:) = nnMdl(xk(1:4));
-% %         xk = stateFunctionDT(xk, tau, params);
-% 
-%         xHistory(t,:) = xk';
-%         uHistory(t,:) = mv';
-%     end
-%     mv = info.MVopt(end,:)';
-%     xk = info.Xopt(end,:)';
-% end
-% xHistory(end,:) = xk';
-% uHistory(end,:) = mv';
+for ct = 1:(nSamples/p)
+    tau_g = g(q_ref);
+    fprintf("t = %.4f\n", ct * Ts * p);
+    state = xk(1:4)'
+    
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
+%     tau = tau_g + mv;
+    for k=1:p
+        t = (ct-1)*p + k;
+        xk = info.Xopt(k,:)';
+        uk = info.MVopt(k,:)';
+        
+%         psiHistory(t,:) = nonlinearElasticity(xk, params.K1, params.K2);
+%         psiGP(t,:) = gpPredict(xk, params.model);
+%         psiNN(t,:) = nnMdl(xk(1:4));
+%         xk = stateFunctionDT(xk, tau, params);
+
+        xHistory(t,:) = xk';
+        uHistory(t,:) = mv';
+    end
+    mv = info.MVopt(end,:)';
+    xk = info.Xopt(end,:)';
+end
+xHistory(end,:) = xk';
+uHistory(end,:) = mv';
 
 % tic
 % [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
@@ -84,31 +84,31 @@ nloptions = nlmpcmoveopt;
 % uHistory = info.MVopt;
 
 %% Simulate closed-loop system
-dataset = params.dataset;
-for ct = 1:nSamples
-    tau_g = g(q_ref);
-    fprintf("t = %.4f\n", ct * Ts);
-    state = xk(1:4)'
-    
-    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
-    tau = tau_g + mv;
-    
-    [xk, xk_dot] = stateFunctionDT(xk, tau, params);
-    
-    % Reconstruct elasticity
-    if size(dataset,1) < params.datasetDimension
-        q = xk(1:2);
-        theta = xk(3:4);
-        theta_dot = xk_dot(3:4);
-        theta_ddot = xk_dot(7:8);
-        psi = B*theta_ddot + D*theta_dot - tau;
-        
-        dataset(end+1, :) = [q-theta; psi]';
-        params.model = gpTrain(dataset);
-    end
-    xHistory(ct,:) = xk';
-    uHistory(ct,:) = mv';
-end
+% dataset = params.dataset;
+% for ct = 1:nSamples
+%     tau_g = g(q_ref);
+%     fprintf("t = %.4f\n", ct * Ts);
+%     state = xk(1:4)'
+%     
+%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
+%     tau = tau_g + mv;
+%     
+%     [xk, xk_dot] = stateFunctionDT(xk, tau, params);
+%     
+%     % Reconstruct elasticity
+% %     if size(dataset,1) < params.datasetDimension
+% %         q = xk(1:2);
+% %         theta = xk(3:4);
+% %         theta_dot = xk_dot(3:4);
+% %         theta_ddot = xk_dot(7:8);
+% %         psi = B*theta_ddot + D*theta_dot - tau;
+% %         
+% %         dataset(end+1, :) = [q-theta; psi]';
+% %         params.model = gpTrain(dataset);
+% %     end
+%     xHistory(ct,:) = xk';
+%     uHistory(ct,:) = mv';
+% end
 
 %% Plot closed-loop response
 figure
