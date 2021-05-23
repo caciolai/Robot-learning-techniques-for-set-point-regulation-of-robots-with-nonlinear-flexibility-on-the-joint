@@ -19,16 +19,6 @@ parameters;
 % 
 % load('data_mpc.mat');
 % data_mpc_full = [input; output];
-% 
-% % Reducing data size
-% reduction_data_size = 10;
-% k = 1;
-% for i = 1 : reduction_data_size : size(data_mpc_full,2)
-%     data_mpc(:,k) = data_mpc_full(:,i);
-%     k = k +1;
-% end
-% 
-% dataset = [data_traj, data_mpc];
 
 % load('dataset.mat')
 % input = dataset(1:2,:);

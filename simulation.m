@@ -51,13 +51,18 @@ uHistory = zeros(nSamples,nu);
 nloptions = nlmpcmoveopt;
 
 %% Simulate nominal system
+dataset = params.dataset;
+params.model = gpTrain(dataset);
+training = true;
+theta_dot_old = [0;0];
+
 for ct = 1:(nSamples/p)
     tau_g = g(q_ref);
     fprintf("t = %.4f\n", ct * Ts * p);
     state = xk(1:4)'
     
     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv,x_ref,0,nloptions);
-%     tau = tau_g + mv;
+
     for k=1:p
         t = (ct-1)*p + k;
         xk = info.Xopt(k,:)';
@@ -66,11 +71,38 @@ for ct = 1:(nSamples/p)
 %         psiHistory(t,:) = nonlinearElasticity(xk, params.K1, params.K2);
 %         psiGP(t,:) = gpPredict(xk, params.model);
 %         psiNN(t,:) = nnMdl(xk(1:4));
-%         xk = stateFunctionDT(xk, tau, params);
+        
+        tau = tau_g + mv;
+        xk = stateFunctionDT(xk, tau, params);
 
         xHistory(t,:) = xk';
         uHistory(t,:) = mv';
+        
+        % Reconstruct elasticity
+        if size(dataset,2) < params.datasetDimension
+            q = xk(1:2);
+            theta = xk(3:4);
+            theta_dot = xk(7:8);
+            if t > 1
+                theta_dot_old = xHistory(t-1, 7:8)';
+            end
+            theta_ddot = (theta_dot - theta_dot_old)/Ts;
+            psi = B*theta_ddot + D*theta_dot - tau;
+
+            dataset(:, end+1) = [q-theta; psi];
+        else
+            training = false;
+        end
     end
+    % Retrain GP on the augmented dataset
+    if training
+        fprintf("Dataset dimension: %d\n", size(dataset, 2));
+        disp("Training...");
+        tic
+        params.model = gpTrain(dataset);
+        toc
+    end
+    
     mv = info.MVopt(end,:)';
     xk = info.Xopt(end,:)';
 end
@@ -96,16 +128,16 @@ uHistory(end,:) = mv';
 %     [xk, xk_dot] = stateFunctionDT(xk, tau, params);
 %     
 %     % Reconstruct elasticity
-% %     if size(dataset,1) < params.datasetDimension
-% %         q = xk(1:2);
-% %         theta = xk(3:4);
-% %         theta_dot = xk_dot(3:4);
-% %         theta_ddot = xk_dot(7:8);
-% %         psi = B*theta_ddot + D*theta_dot - tau;
-% %         
-% %         dataset(end+1, :) = [q-theta; psi]';
-% %         params.model = gpTrain(dataset);
-% %     end
+%     if size(dataset,1) < params.datasetDimension
+%         q = xk(1:2);
+%         theta = xk(3:4);
+%         theta_dot = xk_dot(3:4);
+%         theta_ddot = xk_dot(7:8);
+%         psi = B*theta_ddot + D*theta_dot - tau;
+%         
+%         dataset(end+1, :) = [q-theta; psi]';
+%         params.model = gpTrain(dataset);
+%     end
 %     xHistory(ct,:) = xk';
 %     uHistory(ct,:) = mv';
 % end

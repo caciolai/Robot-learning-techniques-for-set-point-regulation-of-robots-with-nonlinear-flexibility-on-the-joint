@@ -47,7 +47,7 @@ params.dgTs = 1e-3;
 params.nTrajectories = 100;
 params.reductionStep = 10;
 
-params.datasetDimension = 100;
+params.datasetDimension = 300;
 params.datasetDimensionInit = 10;
 
 %% MPC parameters

@@ -14,13 +14,14 @@ parameters;
 
 %% Load model
 load('savedData/gpMdl.mat');
+load('savedData/nnMdl.mat');
 
 %% Evaluate the predictions
 % test_pred_1 = predict(gpMdl{1}, test_data);
 % test_pred_2 = predict(gpMdl{2}, test_data);
 
 % Test on "exciting" trajectories
-u_max = 1e1;
+u_max = params.maxTorque;
 DeltaT = 100;
 Ts = params.Ts;
 T = params.T;
@@ -46,7 +47,8 @@ for ct=1:nSamples
     xHistory(ct,:) = xk';
     uHistory(ct,:) = u';
     psiReal(ct,:) = nonlinearElasticity(xk(1:2)-xk(3:4), params);
-    psiPredicted(ct,:) = gpPredict(xk, gpMdl);
+%     psiPredicted(ct,:) = gpPredict(xk, gpMdl);
+    psiPredicted(ct,:) = nnMdl(xk(1:2)-xk(3:4));
 end
 
 y = psiReal;
@@ -96,6 +98,8 @@ hold on
 grid on
 plot(t, xHistory(:,1));
 plot(t, xHistory(:,3));
+xlabel('[s]');
+ylabel('[Nm]');
 legend('$q_1$', '$\theta_1$', 'interpreter', 'latex');
 title('First joint trajectory');
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
@@ -105,6 +109,8 @@ hold on
 grid on
 plot(t, xHistory(:,2));
 plot(t, xHistory(:,4));
+xlabel('[s]');
+ylabel('[Nm]');
 legend('$q_2$', '$\theta_2$', 'interpreter', 'latex');
 title('Second joint trajectory');
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
@@ -114,6 +120,8 @@ hold on
 grid on
 plot(t, uHistory(:,1));
 plot(t, uHistory(:,2));
+xlabel('[s]');
+ylabel('[Nm]');
 legend('$u_1$', '$u_2$', 'interpreter', 'latex');
 title('Commanded torque');
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
@@ -123,6 +131,8 @@ hold on
 grid on
 plot(t, psiReal(:,1)-psiPredicted(:,1));
 plot(t, psiReal(:,2)-psiPredicted(:,2));
+xlabel('[s]');
+ylabel('[Nm]');
 legend('$e_1$', '$e_2$', 'interpreter', 'latex');
 title('Prediction error');
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it

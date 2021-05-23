@@ -49,7 +49,6 @@ nlmpcObj.Ts = params.Ts;
 nlmpcObj.PredictionHorizon = params.controlHorizon;  
 nlmpcObj.ControlHorizon = params.controlHorizon;       
 nlmpcObj.Model.NumberOfParameters = 0;
-
  
 % System linearization and LQR
 Q = params.Q;
@@ -86,7 +85,7 @@ u0 = params.u0;
 validateFcns(nlmpcObj,x0,u0);
 
 %% Initialize dataset
-% initializeDataset;
+initializeDataset;
 
 %% Cleanup
 clearvars -except nlmpcObj params
