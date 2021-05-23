@@ -11,18 +11,22 @@ addpath(genpath('./mpcFunctions'));
 addpath(genpath('./savedData'));
 addpath(genpath('./utils'));
 
+mpcSetup;
+nlmpcObj.Model.StateFcn = ...
+    @(x, u) mpcDataGenStateFunctionDT(x, u, params); 
+
 %% Data manipulation
 % Clear old data_mpc
-ask = input('Delete old data_mpc? (1 = yes; 0 = no');
+ask = input('Delete old data_mpc? (1 = yes; 0 = no) :');
 if ask == 1
     load('dataNull.mat');
     data_mpc = [input; output];
-    save('..\savedData\data_mpc.mat','input','output');
+    save('savedData\data_mpc.mat','input','output');
 end
 
 %% Load parameters, model and setup mpc
 % robotModel;
-mpcDataGenSetup;
+% mpcDataGenSetup;
 
 x0 = params.x0;
 u0 = params.u0;
@@ -34,7 +38,7 @@ nx = nlmpcObj.Dimensions.NumberOfStates;
 nu = nlmpcObj.Dimensions.NumberOfInputs;
 ny = nlmpcObj.Dimensions.NumberOfOutputs;
 
-p = params.p;
+p = params.controlHorizon;
 
 %% Initialize simulation
 mv = u0;

@@ -1,13 +1,20 @@
 %% GENERATION OF DATA TO TRAIN OFFLINE THE GP ON THE ELASTIC TERM
+clc 
 
 addpath(genpath('../'));
-addpath(genpath('./utils'));
+addpath(genpath('./dataGeneration'));
 addpath(genpath('./modelFunctions'));
+addpath(genpath('./modelsTraining'));
+addpath(genpath('./mpcFunctions'));
+addpath(genpath('./savedData'));
+addpath(genpath('./utils'));
 
 %% Parameters 
 parameters;
 plotting = false;
 
+reductionStep = params.reductionStep;
+nTrajectories = params.nTrajectories;
 dgT = params.dgT;
 dgTs = params.dgTs;
 B = params.B;
