@@ -17,7 +17,7 @@ load('data_traj.mat');
 data_traj_full = [input; output];
 
 % Reducing data size
-reduction_data_size = 100;
+reduction_data_size = 10;
 
 k = 1;
 for i = 1 : reduction_data_size : size(data_traj_full,2)
