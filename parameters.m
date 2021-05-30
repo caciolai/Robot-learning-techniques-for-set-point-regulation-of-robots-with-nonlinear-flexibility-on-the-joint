@@ -36,7 +36,7 @@ params.D = eye(2) * 10;
 
 %% Time parameters
 params.T = 1;      % Final time instant
-params.Ts = 1e-3;   % Integration step    
+params.Ts = 1e-2;   % Integration step    
 
 %% Data generation parameters
 
@@ -52,10 +52,10 @@ params.datasetDimensionInit = 10;
 
 %% MPC parameters
 
-params.controlHorizon = 30;
-% params.controlHorizon = 100;
+% params.controlHorizon = 30;
+params.controlHorizon = 100;
 params.lastSteps = 5;
-params.maxTorque = 1;
+params.maxTorque = 10;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned

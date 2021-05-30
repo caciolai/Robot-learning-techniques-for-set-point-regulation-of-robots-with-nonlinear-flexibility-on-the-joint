@@ -29,6 +29,7 @@ p = params.controlHorizon;
 
 B = params.B;
 D = params.D;
+
 %% Initialize simulation
 mv = u0;
 xk = x0;
@@ -43,19 +44,14 @@ nSamples = nSamples + (p - mod(nSamples, p));
 % to record history of simulation
 xHistory = zeros(nSamples,nx);
 uHistory = zeros(nSamples,nu);
-% psiHistory = zeros(nSamples,2);
-% psiGP = zeros(nSamples,2);
-% psiNN = zeros(nSamples,2);
-
-
 nloptions = nlmpcmoveopt;
 
-% %% Simulate nominal system (prendiamo tutti i punti)
-% % dataset = params.dataset;
-% % params.model = gpTrain(dataset);
-% % training = true;
-% % theta_dot_old = [0;0];
-% 
+%% Simulate nominal system (prendiamo tutti i punti)
+dataset = params.dataset;
+params.model = gpTrain(dataset);
+training = true;
+theta_dot_old = [0;0];
+
 % for ct = 1:(nSamples/p)
 %     tau_g = g(q_ref);
 % %     fprintf("t = %.4f\n", ct * Ts * p);
@@ -72,9 +68,32 @@ nloptions = nlmpcmoveopt;
 % %         xk = stateFunctionDT(xk, tau, params);
 % 
 %         xHistory(t,:) = xk';
-%         uHistory(t,:) = uk';%         
-
+%         uHistory(t,:) = uk';
+%         
+%         % Reconstruct elasticity
+% %         if size(dataset,2) < params.datasetDimension
+% %             q = xk(1:2);
+% %             theta = xk(3:4);
+% %             theta_dot = xk(7:8);
+% %             if t > 1
+% %                 theta_dot_old = xHistory(t-1, 7:8)';
+% %             end
+% %             theta_ddot = (theta_dot - theta_dot_old)/Ts;
+% %             psi = B*theta_ddot + D*theta_dot - tau;
+% % 
+% %             dataset(:, end+1) = [q-theta; psi];
+% %         else
+% %             training = false;
+% %         end
 %     end
+%     % Retrain GP on the augmented dataset
+% %     if training
+% %         fprintf("Dataset dimension: %d\n", size(dataset, 2));
+% %         disp("Training...");
+% %         tic
+% %         params.model = gpTrain(dataset);
+% %         toc
+% %     end
 %     
 %     mv = info.MVopt(end,:)';
 %     xk = info.Xopt(end,:)';
@@ -82,30 +101,35 @@ nloptions = nlmpcmoveopt;
 % xHistory(end,:) = xk';
 % uHistory(end,:) = mv';
 
-tic
-[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
-toc
-% xHistory = info.Xopt;
-% uHistory = info.MVopt;
+%% Simulate closed-loop system (simulazione vera: solo il primo punto)
+dataset = params.dataset;
 
-% %% Simulate closed-loop system (simulazione vera: solo il primo punto)
-% % dataset = params.dataset;
-% for ct = 1:nSamples
-%     tau_g = g(q_ref);
+for ct = 1:nSamples
+    tau_g = g(q_ref);
 %     fprintf("t = %.4f\n", ct * Ts);
 %     state = xk(1:4)'
-%     
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
-%     tau = tau_g + mv;
-%     
-%     xk = stateFunctionDT(xk, tau, params);
-%     
-%     xHistory(ct,:) = xk';
-%     uHistory(ct,:) = mv';
-% end
+    
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
+    tau = tau_g + mv;
+    
+    xk = stateFunctionDT(xk, tau, params);
+    
+    % Reconstruct elasticity
+    if size(dataset,1) < params.datasetDimension
+        q = xk(1:2);
+        theta = xk(3:4);
+        theta_dot = xk_dot(3:4);
+        theta_ddot = xk_dot(7:8);
+        psi = B*theta_ddot + D*theta_dot - tau;
+        
+        dataset(end+1, :) = [q-theta; psi]';
+        params.model = gpTrain(dataset);
+    end
+    xHistory(ct,:) = xk';
+    uHistory(ct,:) = mv';
+end
 
 %% Plot closed-loop response
-
 t = linspace(0, T, nSamples)';
 % t = linspace(0, p, p+1);
 
