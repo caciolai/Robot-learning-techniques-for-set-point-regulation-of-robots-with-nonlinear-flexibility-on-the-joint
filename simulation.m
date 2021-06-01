@@ -29,6 +29,7 @@ p = params.controlHorizon;
 
 B = params.B;
 D = params.D;
+
 %% Initialize simulation
 mv = u0;
 xk = x0;
@@ -47,48 +48,43 @@ uHistory = zeros(nSamples,nu);
 % psiGP = zeros(nSamples,2);
 % psiNN = zeros(nSamples,2);
 
-
 nloptions = nlmpcmoveopt;
 
-% %% Simulate nominal system (prendiamo tutti i punti)
-% % dataset = params.dataset;
-% % params.model = gpTrain(dataset);
-% % training = true;
-% % theta_dot_old = [0;0];
-% 
-% for ct = 1:(nSamples/p)
-%     tau_g = g(q_ref);
-% %     fprintf("t = %.4f\n", ct * Ts * p);
-% %     state = xk(1:4)'
-%     
-%     [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
-% 
-%     for k=1:p
-%         t = (ct-1)*p + k;
-%         xk = info.Xopt(k,:)';
-%         uk = info.MVopt(k,:)';
-%         
-% %         tau = tau_g + uk;
-% %         xk = stateFunctionDT(xk, tau, params);
-% 
-%         xHistory(t,:) = xk';
-%         uHistory(t,:) = uk';%         
+%% Simulate nominal system (prendiamo tutti i punti)
+for ct = 1:(nSamples/p)
+    tau_g = g(q_ref);
+%     fprintf("t = %.4f\n", ct * Ts * p);
+%     state = xk(1:4)'
+    
+    [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
 
-%     end
-%     
-%     mv = info.MVopt(end,:)';
-%     xk = info.Xopt(end,:)';
-% end
-% xHistory(end,:) = xk';
-% uHistory(end,:) = mv';
+    for k=1:p
+        t = (ct-1)*p + k;
+        xk = info.Xopt(k,:)';
+        uk = info.MVopt(k,:)';
+        
+        tau = tau_g + uk;
+        xk = stateFunctionDT(xk, tau, params);
 
-tic
-[mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
-toc
+        xHistory(t,:) = xk';
+        uHistory(t,:) = uk';        
+
+    end
+    
+    mv = info.MVopt(end,:)';
+    xk = info.Xopt(end,:)';
+end
+xHistory(end,:) = xk';
+uHistory(end,:) = mv';
+
+%% Simulazione "botta unica"
+% tic
+% [mv,nloptions,info] = nlmpcmove(nlmpcObj,xk,mv);
+% toc
 % xHistory = info.Xopt;
 % uHistory = info.MVopt;
 
-% %% Simulate closed-loop system (simulazione vera: solo il primo punto)
+%% Simulate closed-loop system (simulazione vera: solo il primo punto)
 % % dataset = params.dataset;
 % for ct = 1:nSamples
 %     tau_g = g(q_ref);
