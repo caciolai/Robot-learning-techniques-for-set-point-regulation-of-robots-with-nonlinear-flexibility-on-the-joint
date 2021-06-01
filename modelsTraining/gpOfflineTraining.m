@@ -20,12 +20,14 @@ parameters;
 % load('data_mpc.mat');
 % data_mpc_full = [input; output];
 
-% load('dataset.mat')
+load('dataset.mat')
 % input = dataset(1:2,:);
 % output = dataset(3:4,:);
+input = dataset(1:2,1:10);
+output = dataset(3:4,1:10);
 
-load('data_exc.mat');
-dataset = [input output]';
+% load('data_exc.mat');
+% dataset = [input output]';
 
 %% Prepare dataset for training
 

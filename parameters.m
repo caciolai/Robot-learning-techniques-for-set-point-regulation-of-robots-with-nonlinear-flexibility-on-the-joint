@@ -36,10 +36,9 @@ params.D = eye(2) * 10;
 
 %% Time parameters
 params.T = 1;      % Final time instant
-params.Ts = 1e-2;   % Integration step    
+params.Ts = 1e-3;   % Integration step    
 
 %% Data generation parameters
-
 % params for data generation
 params.dgT = 1;
 params.dgTs = 1e-3;
@@ -51,11 +50,10 @@ params.datasetDimension = 300;
 params.datasetDimensionInit = 10;
 
 %% MPC parameters
-
 % params.controlHorizon = 30;
 params.controlHorizon = 100;
 params.lastSteps = 5;
-params.maxTorque = 10;
+params.maxTorque = 100;
 
 % Weight matrices for LQR
 Q = eye(8);           % to be tuned
@@ -65,11 +63,9 @@ params.Q = Q;
 params.R = eye(2);           % to be tuned 
 params.N = zeros(8,2);
 
-
 %% Simulation configuration
-
 % initial configuration
-q0 = [0; 0];
+q0 = [-pi/2; 0];
 theta0 = q0;
 q0_dot = [0; 0];
 theta0_dot = q0_dot;
@@ -79,18 +75,24 @@ params.x0 = [q0; theta0; q0_dot; theta0_dot];
 params.u0 = [0; 0];
 
 % desired link position
-params.q_ref = [pi/4 pi/4]';
+params.q_ref = [pi/2, 0]';
 % params.q_ref(1) = input('Desired link 1 position : ');
 % params.q_ref(2) = input('Desired link 2 position : ');
 
 %% Learning model
-
 % Load model trained offline
 load('gpMdl.mat');
 % load('nnMdl.mat');
 
 params.model = gpMdl;
 % params.model = nnMdl;
+
+%% Load dataset
+% load('dataset.mat');
+load('data_exc.mat');
+dataset = [input; output];
+
+params.dataset = dataset;
 
 %% Cleanup
 
