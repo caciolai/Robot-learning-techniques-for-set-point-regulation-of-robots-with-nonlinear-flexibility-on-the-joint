@@ -36,7 +36,7 @@ params.D = eye(2) * 10;
 
 %% Time parameters
 params.T = 1;      % Final time instant
-params.Ts = 1e-3;   % Integration step    
+params.Ts = 1e-2;   % Integration step    
 
 %% Data generation parameters
 % params for data generation

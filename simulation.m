@@ -39,14 +39,11 @@ theta_ref = x_ref(3:4)';
 
 nSamples = T/Ts;
 % so that it is a multiple of p
-nSamples = nSamples + (p - mod(nSamples, p)); 
+% nSamples = nSamples + (p - mod(nSamples, p)); 
 
 % to record history of simulation
 xHistory = zeros(nSamples,nx);
 uHistory = zeros(nSamples,nu);
-% psiHistory = zeros(nSamples,2);
-% psiGP = zeros(nSamples,2);
-% psiNN = zeros(nSamples,2);
 
 nloptions = nlmpcmoveopt;
 
@@ -63,8 +60,8 @@ for ct = 1:(nSamples/p)
         xk = info.Xopt(k,:)';
         uk = info.MVopt(k,:)';
         
-        tau = tau_g + uk;
-        xk = stateFunctionDT(xk, tau, params);
+%         tau = tau_g + uk;
+%         xk = stateFunctionDT(xk, tau, params);
 
         xHistory(t,:) = xk';
         uHistory(t,:) = uk';        
@@ -76,6 +73,58 @@ for ct = 1:(nSamples/p)
 end
 xHistory(end,:) = xk';
 uHistory(end,:) = mv';
+
+disp("Reconstructing model error...");
+
+%% Reconstruct learning history
+dataset = params.dataset;
+params.model = gpTrain(dataset);
+training = true;
+theta_dot_old = [0;0];
+
+p = 10;
+eHistory = zeros(nSamples/p, 1); % norm of error
+for ct = 1:(nSamples/p)
+    for k=1:p
+        t = (ct-1)*p + k;
+        xk = xHistory(t, :)';
+        uk = uHistory(t,:)';  
+        tau = tau_g + uk;
+        
+        % Reconstruct elasticity
+        if size(dataset,2) < params.datasetDimension
+            q = xk(1:2);
+            theta = xk(3:4);
+            theta_dot = xk(7:8);
+            if t > 1
+                theta_dot_old = xHistory(t-1, 7:8)';
+            end
+            theta_ddot = (theta_dot - theta_dot_old)/Ts;
+            psi = B*theta_ddot + D*theta_dot - tau;
+
+            dataset(:, end+1) = [q-theta; psi];
+        else
+            training = false;
+        end
+    end
+    if training
+        % Retrain GP on the augmented dataset
+        fprintf("Dataset dimension: %d\n", size(dataset, 2));
+        disp("Training...");
+        tic
+        params.model = gpTrain(dataset);
+        toc
+    end
+    
+    % Compute predicted and ground truth elastic term
+    psi_real = nonlinearElasticity(q-theta, params);
+    psi_pred = gpPredict(xk, params.model);
+    error = psi_real-psi_pred;
+    
+    % Compute error norm and update errorHistory
+    errorNorm = norm(error);
+    eHistory(ct, :) = errorNorm;
+end
 
 %% Simulazione "botta unica"
 % tic
@@ -170,4 +219,15 @@ xlabel('[s]')
 ylabel('[Nm]')
 legend('$\tau_1$', '$\tau_2$', 'Interpreter', 'latex', 'Location', 'best');
 title('Controlled torque')
+set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+
+% plot errore
+figure
+hold on
+grid on
+t = linspace(0,10, size(eHistory, 1));
+plot(t,eHistory(:,1));
+xlabel('Re-training step')
+legend('error', 'Location', 'best');
+title('Norm of prediction error')
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
