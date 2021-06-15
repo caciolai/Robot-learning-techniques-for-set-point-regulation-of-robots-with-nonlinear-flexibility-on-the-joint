@@ -21,7 +21,8 @@ load('savedData/nnMdl.mat');
 % test_pred_2 = predict(gpMdl{2}, test_data);
 
 % Test on "exciting" trajectories
-u_max = params.maxTorque;
+% u_max = params.maxTorque;
+u_max = 1;
 DeltaT = 100;
 Ts = params.Ts;
 T = params.T;
@@ -91,48 +92,69 @@ RMSE = sqrt(mean((y - y_hat).^2))  % Root Mean Squared Error
 % legend('Error link 2');
 % set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
+% t = linspace(0,T,T/Ts)';
+% figure
+% subplot(2,2,1)
+% hold on 
+% grid on
+% plot(t, xHistory(:,1));
+% plot(t, xHistory(:,3));
+% xlabel('[s]');
+% ylabel('[Nm]');
+% legend('$q_1$', '$\theta_1$', 'interpreter', 'latex');
+% title('First joint trajectory');
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% 
+% subplot(2,2,2)
+% hold on 
+% grid on
+% plot(t, xHistory(:,2));
+% plot(t, xHistory(:,4));
+% xlabel('[s]');
+% ylabel('[Nm]');
+% legend('$q_2$', '$\theta_2$', 'interpreter', 'latex');
+% title('Second joint trajectory');
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% 
+% subplot(2,2,3)
+% hold on 
+% grid on
+% plot(t, uHistory(:,1));
+% plot(t, uHistory(:,2));
+% xlabel('[s]');
+% ylabel('[Nm]');
+% legend('$u_1$', '$u_2$', 'interpreter', 'latex');
+% title('Commanded torque');
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% 
+% subplot(2,2,4)
+% hold on 
+% grid on
+% plot(t, psiReal(:,1)-psiPredicted(:,1));
+% plot(t, psiReal(:,2)-psiPredicted(:,2));
+% xlabel('[s]');
+% ylabel('[Nm]');
+% legend('$e_1$', '$e_2$', 'interpreter', 'latex');
+% title('Prediction error');
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+
 t = linspace(0,T,T/Ts)';
 figure
-subplot(2,2,1)
-hold on 
-grid on
-plot(t, xHistory(:,1));
-plot(t, xHistory(:,3));
-xlabel('[s]');
-ylabel('[Nm]');
-legend('$q_1$', '$\theta_1$', 'interpreter', 'latex');
-title('First joint trajectory');
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
-subplot(2,2,2)
 hold on 
 grid on
-plot(t, xHistory(:,2));
-plot(t, xHistory(:,4));
-xlabel('[s]');
-ylabel('[Nm]');
-legend('$q_2$', '$\theta_2$', 'interpreter', 'latex');
-title('Second joint trajectory');
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
-subplot(2,2,3)
-hold on 
-grid on
-plot(t, uHistory(:,1));
-plot(t, uHistory(:,2));
-xlabel('[s]');
-ylabel('[Nm]');
-legend('$u_1$', '$u_2$', 'interpreter', 'latex');
-title('Commanded torque');
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+plot(t, abs(psiReal(:,1)-psiPredicted(:,1)));
+plot(t, repmat(RMSE(1), length(t),1));
 
-subplot(2,2,4)
-hold on 
-grid on
-plot(t, psiReal(:,1)-psiPredicted(:,1));
-plot(t, psiReal(:,2)-psiPredicted(:,2));
+plot(t, abs(psiReal(:,2)-psiPredicted(:,2)));
+plot(t, repmat(RMSE(2), length(t),1));
+
 xlabel('[s]');
 ylabel('[Nm]');
-legend('$e_1$', '$e_2$', 'interpreter', 'latex');
-title('Prediction error');
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+
+legend('Absolute error (Joint 1)', 'RMSE (Joint 1)', ...
+    'Absolute error (Joint 2)', 'RMSE (Joint 2)', ...
+    'Location', 'northwest');
+title('Prediction error (GP)');
+set(findall(gcf,'type','line'),'linewidth',2);

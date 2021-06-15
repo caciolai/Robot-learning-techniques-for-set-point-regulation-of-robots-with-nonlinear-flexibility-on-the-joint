@@ -23,10 +23,10 @@ function x_dot = mpcStateFunctionCT(x, u, params)
 
     % Compute elastic term
 %     psi = linearElasticity(x, K1);
-%     psi = nonlinearElasticity(q-theta, params);
+    psi = nonlinearElasticity(q-theta, params);
     
     %% Using gp prediction
-    psi = gpPredict(x, model);
+%     psi = gpPredict(x, model);
     
     %% Using NN prediction
 %     psi = model([q;theta]); 
