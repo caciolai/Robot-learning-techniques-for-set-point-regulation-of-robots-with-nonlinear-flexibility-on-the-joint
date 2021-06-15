@@ -106,50 +106,46 @@ t = linspace(0, T, nSamples)';
 % t = linspace(0, p, p+1);
 
 figure
-subplot(2,1,1)
 hold on
 grid on
-plot(t,xHistory(:,1));
-plot(t,repmat(q_ref(1), length(t),1));
+plot(t,repmat(q_ref(1),length(t),1) - xHistory(:,1));
+plot(t,repmat(q_ref(2),length(t),1) - xHistory(:,2));
 xlabel('[s]')
 ylabel('[rad]')
-legend('$q_1$', '$q_1^d$', 'Interpreter', 'latex', 'Location', 'best');
-title('First link position')
+legend('$e_1$', '$e_2$', 'Interpreter', 'latex', 'Location', 'best');
+title('Links position error')
 set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
-subplot(2,1,2)
-hold on
-grid on
-plot(t,xHistory(:,2));
-plot(t,repmat(q_ref(2), length(t),1));
-xlabel('[s]')
-ylabel('[rad]')
-legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex', 'Location', 'best');
-title('Second link position')
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% 
+% plot(t,repmat(q_ref(2),length(t),1) - xHistory(:,2));
+% xlabel('[s]')
+% ylabel('[rad]')
+% legend('$q_2$', '$q^d_2$', 'Interpreter', 'latex', 'Location', 'best');
+% title('Second link position')
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
-figure
-subplot(2,1,1)
-hold on
-grid on
-plot(t,xHistory(:,1));
-plot(t,xHistory(:,3));
-xlabel('[s]')
-ylabel('[rad]')
-legend('$q_1$', '$\theta_1$', 'Interpreter', 'latex', 'Location', 'best');
-title('First link and motor position')
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% figure
+% subplot(2,1,1)
+% hold on
+% grid on
+% plot(t,xHistory(:,1));
+% plot(t,xHistory(:,3));
+% xlabel('[s]')
+% ylabel('[rad]')
+% legend('$q_1$', '$\theta_1$', 'Interpreter', 'latex', 'Location', 'best');
+% title('First link and motor position')
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
-subplot(2,1,2)
-hold on
-grid on
-plot(t,xHistory(:,2));
-plot(t,xHistory(:,4));
-xlabel('[s]')
-ylabel('[rad]')
-legend('$q_2$', '$\theta_2$', 'Interpreter', 'latex', 'Location', 'best');
-title('Second link and motor position')
-set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
+% subplot(2,1,2)
+% hold on
+% grid on
+% plot(t,xHistory(:,2));
+% plot(t,xHistory(:,4));
+% xlabel('[s]')
+% ylabel('[rad]')
+% legend('$q_2$', '$\theta_2$', 'Interpreter', 'latex', 'Location', 'best');
+% title('Second link and motor position')
+% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
 % subplot(2,2,3)
 % hold on
