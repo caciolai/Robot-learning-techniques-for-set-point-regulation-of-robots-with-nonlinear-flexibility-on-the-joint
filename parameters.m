@@ -50,8 +50,8 @@ params.datasetDimension = 300;
 params.datasetDimensionInit = 10;
 
 %% MPC parameters
-% params.controlHorizon = 30;
-params.controlHorizon = 100;
+params.controlHorizon = 30;
+% params.controlHorizon = 100;
 params.lastSteps = 5;
 params.maxTorque = 100;
 
