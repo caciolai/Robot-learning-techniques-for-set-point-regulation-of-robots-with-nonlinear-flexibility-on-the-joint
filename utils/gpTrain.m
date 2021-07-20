@@ -1,6 +1,5 @@
 function gpMdl = gpTrain(dataset)
-%TRAINGP Summary of this function goes here
-%   Detailed explanation goes here
+%% Train a GP model with the given dataset
     
 train_data = dataset(1:2,:)';
 train_target_1 = dataset(3,:)'; % Joint 1 data to train the model

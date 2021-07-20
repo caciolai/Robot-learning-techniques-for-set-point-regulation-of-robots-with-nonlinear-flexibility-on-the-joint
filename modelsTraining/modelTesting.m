@@ -1,6 +1,7 @@
-%% MODEL OFFLINE TESTING
+%% MODEL OFFLINE TESTING (test effectiveness of learning model)
+clc
 clear all
-close all
+close all forced hidden
 
 addpath(genpath('../'));
 addpath(genpath('./dataGeneration'));
@@ -48,8 +49,8 @@ for ct=1:nSamples
     xHistory(ct,:) = xk';
     uHistory(ct,:) = u';
     psiReal(ct,:) = nonlinearElasticity(xk(1:2)-xk(3:4), params);
-%     psiPredicted(ct,:) = gpPredict(xk, gpMdl);
-    psiPredicted(ct,:) = nnMdl(xk(1:2)-xk(3:4));
+    psiPredicted(ct,:) = gpPredict(xk, gpMdl);
+%     psiPredicted(ct,:) = nnMdl(xk(1:2)-xk(3:4));
 end
 
 y = psiReal;
@@ -57,97 +58,16 @@ y_hat = psiPredicted;
 RMSE = sqrt(mean((y - y_hat).^2))  % Root Mean Squared Error
 
 %% Show results
-% figure
-% title("Elastic term (first joint)");
-% hold on
-% grid on
-% plot(test_target_1);
-% plot(test_pred_1);
-% legend('true', 'predicted');
-% set(findall(gcf,'type','line'),'linewidth',1); 
-% 
-% 
-% title("Elastic term (second joint)");
-% hold on
-% grid on
-% plot(test_target_2);
-% plot(test_pred_2);
-% legend('true', 'predicted');
-% set(findall(gcf,'type','line'),'linewidth',1); 
-
-
-% subplot(2,1,1)
-% title("Elastic term error (first joint)");
-% hold on
-% grid on
-% plot(test_target_1 - test_pred_1);
-% legend('Error link 1');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-% 
-% subplot(2,1,2)
-% title("Elastic term error (second joint)");
-% hold on
-% grid on
-% plot(test_target_2 - test_pred_2);
-% legend('Error link 2');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-
-% t = linspace(0,T,T/Ts)';
-% figure
-% subplot(2,2,1)
-% hold on 
-% grid on
-% plot(t, xHistory(:,1));
-% plot(t, xHistory(:,3));
-% xlabel('[s]');
-% ylabel('[Nm]');
-% legend('$q_1$', '$\theta_1$', 'interpreter', 'latex');
-% title('First joint trajectory');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-% 
-% subplot(2,2,2)
-% hold on 
-% grid on
-% plot(t, xHistory(:,2));
-% plot(t, xHistory(:,4));
-% xlabel('[s]');
-% ylabel('[Nm]');
-% legend('$q_2$', '$\theta_2$', 'interpreter', 'latex');
-% title('Second joint trajectory');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-% 
-% subplot(2,2,3)
-% hold on 
-% grid on
-% plot(t, uHistory(:,1));
-% plot(t, uHistory(:,2));
-% xlabel('[s]');
-% ylabel('[Nm]');
-% legend('$u_1$', '$u_2$', 'interpreter', 'latex');
-% title('Commanded torque');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
-% 
-% subplot(2,2,4)
-% hold on 
-% grid on
-% plot(t, psiReal(:,1)-psiPredicted(:,1));
-% plot(t, psiReal(:,2)-psiPredicted(:,2));
-% xlabel('[s]');
-% ylabel('[Nm]');
-% legend('$e_1$', '$e_2$', 'interpreter', 'latex');
-% title('Prediction error');
-% set(findall(gcf,'type','line'),'linewidth',2); % Lanari loves it
 
 t = linspace(0,T,T/Ts)';
 figure
-
 hold on 
 grid on
 
 plot(t, abs(psiReal(:,1)-psiPredicted(:,1)));
-plot(t, repmat(RMSE(1), length(t),1));
-
 plot(t, abs(psiReal(:,2)-psiPredicted(:,2)));
+
+plot(t, repmat(RMSE(1), length(t),1));
 plot(t, repmat(RMSE(2), length(t),1));
 
 xlabel('[s]');

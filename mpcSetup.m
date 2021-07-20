@@ -23,8 +23,8 @@ nlmpcObj = nlmpc(nx,ny,nu);
 %% Plan trajectory
 
 
-% SET POINT FOR NONLINEAR ELASTICITY
-% vogliamo che all'equilibrio il termine elastico compensi la gravità
+% Compute theta_d such that g(theta_d) + psi(q_d - theta_d) = 0,
+% i.e. have elastic term compensate gravity at desired forced equilibrium
 g_ref = g(q_ref);
 
 prob = eqnproblem;

@@ -20,9 +20,6 @@ end
 
 
 %% Elastic parameters
-% rg = 50; % Gear reduction ratio
-% Im_zz = 0.015; % Motor inertia 
-% B = diag([rg.^2 .* Im_zz, rg.^2 .* Im_zz]);  % Theta inertia matrix
 
 % Motor inertia matrix
 params.B = eye(2);
@@ -36,7 +33,7 @@ params.D = eye(2) * 10;
 
 %% Time parameters
 params.T = 1;      % Final time instant
-params.Ts = 1e-2;   % Integration step    
+params.Ts = 1e-3;   % Integration step    
 
 %% Data generation parameters
 % params for data generation
@@ -46,8 +43,9 @@ params.dgTs = 1e-3;
 params.nTrajectories = 100;
 params.reductionStep = 10;
 
-params.datasetDimension = 300;
-params.datasetDimensionInit = 10;
+params.datasetDimension = 200;
+params.collectInterval = 10;
+params.retrainInterval = 10 * params.collectInterval;
 
 %% MPC parameters
 params.controlHorizon = 30;

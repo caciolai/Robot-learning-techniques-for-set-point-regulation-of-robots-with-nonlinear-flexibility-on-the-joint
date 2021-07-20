@@ -1,4 +1,4 @@
 function y = mpcOutputFunction(x, u, params)
-    % Full state
+    % Closing the loop on the full state
     y = x;
 end
