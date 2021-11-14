@@ -1,4 +1,4 @@
-# URProject
+# Robot learning techniques for set point regulation of robots with nonlinear flexibility on the joints
 
 This is our Final Project for the course in Underactuated Robotics A.Y. 2020/2021.
 
