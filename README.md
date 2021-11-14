@@ -27,7 +27,7 @@ Some utility functions are used.
 
 ## Documentation
 
-Work in progress...
+Check the report of the project [here](documentation/report.pdf) and the [presentation](documentation/presentation.pptx) we gave of our project.
 
 ## Resources used
 - MATLAB
