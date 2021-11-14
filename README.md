@@ -30,7 +30,10 @@ Some utility functions are used.
 Check the report of the project [here](documentation/report.pdf) and the [presentation](documentation/presentation.pptx) we gave of our project.
 
 ## Resources used
-- MATLAB
+- [MATLAB Symbolic Math Toolbox](https://it.mathworks.com/products/symbolic.html)
+- [MATLAB Statistics and Machine Learning Toolbox](https://it.mathworks.com/products/statistics.html)
+- [MATLAB Model Predictive Control Toolbox](https://it.mathworks.com/products/model-predictive-control.html)
+- [CoppeliaSim](https://www.coppeliarobotics.com/)
 
 ## Authors
 - Andrea Caciolai
